@@ -185,8 +185,10 @@ export function TypographyStep({ initialData, onBack, onNext, selectedPlatform, 
       .filter(id => !excludeList.includes(id))
       .map(id => {
         const font = ALL_FONTS.find(f => f.id === id);
-        return (font ? font.name : id).replace(/ /g, '+');
-      });
+        return font ? font.name : id;
+      })
+      .filter(name => /^[A-Za-z0-9 -]+$/.test(name))
+      .map(name => encodeURIComponent(name.trim().replace(/\s+/g, '+')));
 
     if (filteredFonts.length === 0) return;
 
