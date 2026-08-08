@@ -1,0 +1,11 @@
+export { CTA } from "./CTA";
+export { FAQ } from "./FAQ";
+export { Features } from "./Features";
+export { Generator } from "./Generator";
+export { Hero } from "./Hero";
+export { HowItWorks } from "./HowItWorks";
+export { OutputPackage } from "./OutputPackage";
+export { Pricing } from "./Pricing";
+export { ProblemAndStructure } from "./ProblemAndStructure";
+export { TrustStrip } from "./TrustStrip";
+export { WorksEverywhere } from "./WorksEverywhere";
