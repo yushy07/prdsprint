@@ -6,7 +6,7 @@ import { PLAN_LIMITS } from "@/lib/credits.config";
 import { Monitor, ArrowLeft, ArrowRight, Lock } from "lucide-react";
 import { FloatingNav } from "../../components/layout";
 import { UpgradeModal } from "@/components/credits/UpgradeModal";
-import { WizardData } from "../Builder";
+import { WizardData } from "@/types/wizard";
 
 // Platform icons
 const BrowserGlobeIcon = () => (

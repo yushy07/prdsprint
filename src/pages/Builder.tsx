@@ -17,30 +17,8 @@ import { useToast } from "@/context/ToastContext";
 import { supabase } from "@/lib/supabase";
 import { PLAN_LIMITS } from "@/lib/credits.config";
 import { GenerationConfig } from "@/lib/creditCalculator";
-
-export interface ColorPalette {
-  id: string;
-  name: string;
-  type: "palette" | "gradient" | "custom";
-  colors: string[];
-  icon?: any;
-  from?: string;
-  to?: string;
-  previewColors?: string[];
-  customRoles?: Record<string, string>;
-}
-
-export interface WizardData {
-  platform: string | null;
-  frontend: string;
-  backend: string;
-  database: string;
-  colorPalette: ColorPalette | null | string;
-  font: string;
-  theme: string;
-  designStyle: string;
-  description: string;
-}
+import { WizardData } from "@/types/wizard";
+import { clearWizardState, loadWizardState, saveWizardState } from "@/lib/wizardStorage";
 
 function StepScrollHandler({ step }: { step: number }) {
   useEffect(() => {
@@ -81,9 +59,8 @@ export function Builder() {
   useEffect(() => {
     async function restoreWizardAndAuth() {
       try {
-        const savedState = localStorage.getItem('prd_wizard_data');
-        if (savedState) {
-          const parsed = JSON.parse(savedState);
+        const parsed = loadWizardState();
+        if (parsed) {
           if (parsed.wizardData) setWizardData(parsed.wizardData);
           if (parsed.selectedPlatform) setSelectedPlatform(parsed.selectedPlatform);
           if (parsed.step) setStep(parsed.step);
@@ -91,7 +68,7 @@ export function Builder() {
           if (parsed.pendingGeneration) {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.access_token) {
-              localStorage.removeItem('prd_wizard_data');
+              clearWizardState();
               await refreshCredits();
               setStep(7);
             }
@@ -117,7 +94,7 @@ export function Builder() {
         if (showAuthModal) {
           setShowAuthModal(false);
           await refreshCredits();
-          localStorage.removeItem('prd_wizard_data');
+          clearWizardState();
           setIsNavigating(true);
           setStep(7);
           setTimeout(() => setIsNavigating(false), 500);
@@ -222,12 +199,12 @@ export function Builder() {
 
     if (!session || !session.access_token) {
       // Save wizard state to preserve every field entered
-      localStorage.setItem('prd_wizard_data', JSON.stringify({
+      saveWizardState({
         wizardData,
         selectedPlatform,
         step: 6,
         pendingGeneration: true
-      }));
+      });
 
       // Prevent generation request completely & open Google Sign-In modal
       setShowGenerationModal(false);
@@ -237,7 +214,7 @@ export function Builder() {
     }
 
     // Authenticated: clear temporary stored state and proceed
-    localStorage.removeItem('prd_wizard_data');
+    clearWizardState();
     setShowGenerationModal(false);
     setIsNavigating(true);
     setStep(7);

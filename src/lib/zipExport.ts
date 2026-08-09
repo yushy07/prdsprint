@@ -1,4 +1,4 @@
-import { WizardData } from "@/pages/Builder";
+import { WizardData } from "@/types/wizard";
 
 export interface GeneratedSections {
   overview?: string;
@@ -65,21 +65,6 @@ export function generateThemeConfiguration(wizardData?: WizardData): string {
 }
 
 export const createPrdZip = async (sections: GeneratedSections | string | null, wizardData?: WizardData) => {
-  if (sections && typeof sections === 'object') {
-    console.log("ZIP RECEIVED", Object.keys(sections));
-    console.log(Object.keys(sections));
-    console.log("UI exists:", !!sections.ui);
-    console.log("UI length:", sections.ui?.length);
-    console.log({
-      overview: !!sections.overview,
-      features: !!sections.features,
-      tech: !!sections.tech,
-      ui: !!sections.ui,
-      roadmap: !!sections.roadmap,
-      theme: !!sections.theme
-    });
-  }
-
   const JSZip = (await import('jszip')).default;
   const zip = new JSZip();
 

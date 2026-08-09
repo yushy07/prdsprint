@@ -32,6 +32,31 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
+For the current Supabase project, set the public URL to:
+
+```text
+VITE_SUPABASE_URL=https://tywjykawhzltkqabuwwx.supabase.co
+```
+
+In Vercel, add both variables to Preview and Production. Never add Supabase
+service-role keys, AI provider keys, payment secrets, or Edge Function secrets
+to Vercel. Only the two `VITE_` variables above are intended for the browser.
+
+The repository intentionally excludes the private `supabase/` directory. The
+frontend calls the already-deployed Supabase Auth, database RPCs, and Edge
+Functions through the public client configuration.
+
+## Vercel deployment
+
+1. Import the GitHub repository into Vercel.
+2. Keep the root directory as the repository root.
+3. Select the Vite framework preset.
+4. Use `npm run build` as the build command.
+5. Use `dist` as the output directory.
+6. Add the two public environment variables above.
+7. Deploy once, then add the Vercel deployment URL to Supabase Auth URL
+   Configuration for the Site URL and Google redirect URLs.
+
 ## Google OAuth Redirect Configuration
 
 The application has no `/auth/callback` route — after OAuth the client lands back on app routes. In the Supabase Dashboard (**Authentication > URL Configuration**):

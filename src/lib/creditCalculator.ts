@@ -1,5 +1,4 @@
 import { PRICING_RULES } from '@/lib/credits.config';
-import { WizardData } from '@/pages/Builder'; // Need to export WizardData or put it somewhere shared, actually I'll just use any for now or copy the interface.
 
 export interface GenerationConfig {
   platform: 'website' | 'android';

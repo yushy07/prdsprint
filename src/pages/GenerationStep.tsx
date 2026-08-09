@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useCredits } from "@/context/CreditContext";
 import { useToast } from "@/context/ToastContext";
 import { supabase } from "@/lib/supabase";
-import { WizardData } from "./Builder";
+import { WizardData } from "@/types/wizard";
 import { createPrdZip, GeneratedSections } from "@/lib/zipExport";
 import { GoogleAuthModal } from "@/components/auth/GoogleAuthModal";
 
@@ -135,7 +135,19 @@ export function GenerationStep({ wizardData }: GenerationStepProps) {
     try {
       // If backend provided a signed download_url, open it
       if (backendDownloadUrlRef.current) {
-        window.open(backendDownloadUrlRef.current, '_blank');
+        let backendUrl: URL;
+        try {
+          backendUrl = new URL(backendDownloadUrlRef.current, window.location.origin);
+        } catch {
+          throw new Error("The download link returned by the server is invalid.");
+        }
+        if (!['https:', 'http:'].includes(backendUrl.protocol)) {
+          throw new Error("The download link returned by the server is unsafe.");
+        }
+        const downloadWindow = window.open(backendUrl.toString(), '_blank', 'noopener,noreferrer');
+        if (!downloadWindow) {
+          throw new Error("Your browser blocked the download window. Please allow pop-ups and try again.");
+        }
         setDownloadNotice(true);
         toast.success("Download started from backend!", "Download Started");
         return;
@@ -407,9 +419,9 @@ export function GenerationStep({ wizardData }: GenerationStepProps) {
         }
       }, 800);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       clearInterval(progressTimer);
-      const msg = err?.message || "An unexpected error occurred during PRD generation.";
+      const msg = err instanceof Error ? err.message : "An unexpected error occurred during PRD generation.";
       setHasError(true);
       setErrorMessage(msg);
       toast.error(msg, "Error");
