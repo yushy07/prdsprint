@@ -8,7 +8,7 @@ assignees: ""
 
 ## Description
 
-A clear and concise description of the bug.
+<!-- What went wrong? Do not share secrets or private user data. -->
 
 ## Steps to reproduce
 
@@ -33,7 +33,14 @@ What actually happened, including any error messages.
 
 ## Screenshots / console output
 
-If applicable, add screenshots or paste the relevant browser console output.
+If applicable, add screenshots or paste relevant browser console output. Remove
+tokens, API keys, emails, and other private information first.
+
+## Logs and errors
+
+```text
+Paste the smallest useful error here.
+```
 
 ## Additional context
 

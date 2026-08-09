@@ -1,6 +1,6 @@
 ## Summary
 
-A short description of what this pull request does and why.
+<!-- What changed, and why? Keep this focused on user or maintainer impact. -->
 
 ## Related issues
 
@@ -8,7 +8,7 @@ Fixes #(issue) / Closes #(issue) / References #(issue)
 
 ## Changes
 
-- List the key changes made.
+-
 
 ## Type of change
 
@@ -19,16 +19,23 @@ Fixes #(issue) / Closes #(issue) / References #(issue)
 
 ## Verification
 
-Describe how you verified the change:
+Describe how you verified the change. Explain any environment limitation:
 
 - [ ] `npm run lint` passes
-- [ ] `npm run test` passes
+- [ ] `npm run test -- --run` passes
 - [ ] `npm run build` passes
 - [ ] Manually tested the affected flow(s)
 
 ## Screenshots (if applicable)
 
 Add screenshots or recordings showing the change.
+
+## Security and deployment checklist
+
+- [ ] No secrets, `.env` files, provider keys, or service-role keys are included
+- [ ] Supabase backend files remain private and are not committed
+- [ ] Browser configuration uses only `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+- [ ] Auth redirects, CORS, or database policies were updated if needed
 
 ## Additional context
 

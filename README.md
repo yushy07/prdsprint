@@ -1,294 +1,219 @@
 <div align="center">
 
-  <img src="assets/prdsprint-mark.svg" alt="PRDSprint" width="120" />
+  <img src="public/logo.svg" alt="PRDSprint logo" width="112" />
 
-  <h1>PRDSprint</h1>
+  # PRDSprint
+
+  **Think. Build. Launch.**
+
+  Turn a product idea into a structured, developer-ready PRD through a guided,
+  AI-assisted workflow.
 
   <p>
-    <strong>Think. Build. Launch.</strong>
+    <a href="https://github.com/yushy07/prdsprint/actions/workflows/codeql.yml"><img src="https://github.com/yushy07/prdsprint/actions/workflows/codeql.yml/badge.svg" alt="CodeQL Advanced" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-3ECF8E?style=flat-square" alt="Apache 2.0 license" /></a>
+    <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white" alt="React 19" />
+    <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript 5.8" />
+    <img src="https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite 6" />
+    <img src="https://img.shields.io/badge/Supabase-connected-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase" />
   </p>
 
   <p>
-    AI-powered Product Requirements Document (PRD) generation — a guided wizard,
-    credit-based plans, and one-click ZIP export.
-  </p>
-
-  <p>
-    <a href="LICENSE">
-      <img src="https://img.shields.io/badge/License-Apache%202.0-3ECF8E?style=for-the-badge" alt="License: Apache 2.0" />
-    </a>
-    <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React 19" />
-    <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.8" />
-    <img src="https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 6" />
-    <img src="https://img.shields.io/badge/Tailwind%20CSS-v4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
-    <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
-    <img src="https://img.shields.io/badge/Tests-23%20%2F%2023-2F855A?style=for-the-badge" alt="Tests: 23/23" />
+    <a href="#getting-started">Get started</a> ·
+    <a href="docs/DEPLOYMENT.md">Deploy</a> ·
+    <a href="docs/ARCHITECTURE.md">Architecture</a> ·
+    <a href="docs/ROADMAP.md">Roadmap</a>
   </p>
 
 </div>
-
----
 
 <div align="center">
 
-> **Public repository scope.** The **frontend** in this repository is public and open for inspection — you can read it, run it locally, and contribute to it. The **backend generation infrastructure** (the AI provider pipeline, database schema, and related server-side systems) is **private and not included** in this repository. See [Architecture](#architecture) and [API](docs/API.md) for the boundary.
+  <img src="public/logo.svg" alt="PRDSprint product mark" width="72" />
+
+  <br />
+
+  <sub>From a rough idea to a clear plan for building it.</sub>
 
 </div>
 
 ---
 
-## Table of Contents
+## What is PRDSprint?
 
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Available Scripts](#available-scripts)
-- [Project Structure](#project-structure)
-- [Credit System](#credit-system)
-- [Documentation](#documentation)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [Security](#security)
-- [License](#license)
+PRDSprint is a React single-page application for creating Product Requirements
+Documents. It guides a user through platform, technology, design, theme,
+typography, and project-definition choices, then requests a structured PRD from
+the private Supabase backend.
 
-## Overview
+The public repository contains the frontend. The private backend contains the
+database schema, RLS policies, RPC functions, AI provider pipeline, and Edge
+Functions. This boundary keeps server-side secrets out of the browser bundle.
 
-PRDSprint is a Product Requirements Document (PRD) generation application. Users are guided through a product-definition wizard, pick a platform (website or Android), a design style, a tech stack, colors, and typography, and then generate a complete, multi-section Markdown PRD that can be downloaded as a ZIP package.
-
-The application is built as a **React single-page application** (the public, open part of the project) that talks to a **Supabase-powered backend** (the private part). Google OAuth is used for authentication, and PRD generation is gated behind a credit system.
-
-## Features
-
-<table align="center">
-  <tr>
-    <td align="center" width="50%">
-      <strong>⚡ Guided PRD wizard</strong><br/>
-      <small>Platform, tech stack, colors &amp; theme, typography, design style, and project details.</small>
-    </td>
-    <td align="center" width="50%">
-      <strong>🎨 Website &amp; Android PRDs</strong><br/>
-      <small>Platform-specific design systems, tech stacks, and style guides.</small>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <strong>🔐 Auth-gated generation</strong><br/>
-      <small>Sign in with Google before generating a PRD.</small>
-    </td>
-    <td align="center">
-      <strong>💳 Credit system</strong><br/>
-      <small>Free / Starter / Pro / Ultimate plans with monthly credit allowances.</small>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <strong>📦 ZIP export</strong><br/>
-      <small>Generated PRD sections packaged into a downloadable ZIP, client-side.</small>
-    </td>
-    <td align="center">
-      <strong>📊 Dashboard</strong><br/>
-      <small>Credits, plan, and credit history at a glance.</small>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <strong>🛠️ Admin console</strong><br/>
-      <small>Users, credits, generations, payments, audit logs, analytics, providers, and system health.</small>
-    </td>
-    <td align="center">
-      <strong>💬 Support form</strong><br/>
-      <small>Validated support submissions routed through the backend.</small>
-    </td>
-  </tr>
-</table>
-
-## Architecture
-
-> **Frontend vs. backend boundary**
-
-- **Frontend (public, this repository):** React SPA. Handles the wizard UI, credit/plan displays, admin dashboard surfaces, and ZIP packaging. Runs fully in the browser.
-- **Backend (private, not in this repository):** Supabase project — PostgreSQL schema, Row Level Security, RPC functions, and Edge Functions (`generate-prd`, `support`). This is where PRD generation actually happens. It is **not included** here; only the client-side integration points (`src/lib/supabase.ts`, `supabase.functions.invoke`) are public.
+## Product flow
 
 ```mermaid
 flowchart LR
-    subgraph Frontend["React Frontend (public)"]
-        W[Wizard UI] --> G[Generation screen]
-        D[Dashboard] --> C[Credit / plan UI]
-        A[Admin surfaces]
+    A[Product idea] --> B[Guided wizard]
+    B --> C[Platform + tech stack]
+    C --> D[Theme + design system]
+    D --> E[Project details]
+    E --> F[Authenticated generation]
+    F --> G[Structured PRD]
+    G --> H[ZIP export]
+```
+
+## Highlights
+
+| Capability | What it does |
+| --- | --- |
+| Guided builder | Collects product, platform, stack, design, and content decisions. |
+| Website and Android flows | Uses platform-specific style guides and PRD data. |
+| Authenticated generation | Requires a Supabase session before generation. |
+| Credit-aware workflow | Shows plans and balances while the backend remains authoritative. |
+| Partial-result handling | Surfaces completed and failed sections with refund information. |
+| ZIP export | Downloads generated sections as a portable Markdown package. |
+| Dashboard | Displays plan, credits, and transaction history. |
+| Admin surfaces | Provides operational views for users, generations, credits, and health. |
+| Support workflow | Validates and routes authenticated support requests. |
+
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Public[Public frontend in this repository]
+        UI[React + TypeScript UI]
+        W[Builder wizard]
+        D[Dashboard and admin surfaces]
+        X[ZIP export fallback]
+        UI --> W
+        UI --> D
+        UI --> X
     end
-    G --> S{supabase.auth /<br/>functions.invoke / .rpc()}
-    S --> B["Supabase Backend (private, external)<br/>Auth · Postgres · Edge Functions"]
-    C --> S
-    A --> S
+
+    subgraph Backend[Private Supabase project]
+        Auth[Auth]
+        DB[(Postgres + RLS + RPCs)]
+        Gen[generate-prd Edge Function]
+        Support[support Edge Function]
+        Store[(Private export storage)]
+    end
+
+    UI --> Auth
+    W --> Gen
+    D --> DB
+    Gen --> DB
+    Gen --> Store
+    UI --> Support
 ```
 
-For full detail, see [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+See [Architecture](docs/ARCHITECTURE.md) for the frontend/backend boundary and
+[API notes](docs/API.md) for the client integration surface.
 
-## Tech Stack
+## Tech stack
 
-<p align="center">
-  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React 19" />
-  <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.8" />
-  <img src="https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 6" />
-  <img src="https://img.shields.io/badge/Tailwind%20CSS-v4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
-  <img src="https://img.shields.io/badge/React%20Router-7-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white" alt="React Router 7" />
-  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
-  <img src="https://img.shields.io/badge/TanStack%20Query-5-FF4154?style=for-the-badge&logo=reactquery&logoColor=white" alt="TanStack Query" />
-  <img src="https://img.shields.io/badge/Motion-12-F97316?style=for-the-badge&logo=smashgg&logoColor=white" alt="Motion" />
-  <img src="https://img.shields.io/badge/Three.js-0.180-000000?style=for-the-badge&logo=threedotjs&logoColor=white" alt="Three.js" />
-  <img src="https://img.shields.io/badge/Recharts-3-22B8CF?style=for-the-badge&logo=recharts&logoColor=white" alt="Recharts" />
-  <img src="https://img.shields.io/badge/JSZip-3-FF6A3D?style=for-the-badge&logo=7zip&logoColor=white" alt="JSZip" />
-  <img src="https://img.shields.io/badge/Vitest-4-6E9F18?style=for-the-badge&logo=vitest&logoColor=white" alt="Vitest" />
-</p>
+- **UI:** React 19, TypeScript 5.8, Vite 6, Tailwind CSS v4
+- **Routing:** React Router 7
+- **Data and auth:** Supabase JS, TanStack Query
+- **Motion and effects:** Motion, Lenis, OGL, Three.js, Postprocessing
+- **Charts and export:** Recharts, JSZip
+- **Testing:** Vitest, Testing Library
+- **Quality:** GitHub CodeQL Advanced, Dependabot, secret protection
 
-| Layer | Technology |
-| --- | --- |
-| UI | React 19, TypeScript 5.8, Vite 6, Tailwind CSS v4 |
-| Routing | React Router 7 |
-| Data & Auth | Supabase (`@supabase/supabase-js`), TanStack Query |
-| Motion & Effects | Motion, Lenis, OGL, Three.js, Postprocessing |
-| Charts | Recharts |
-| Export | JSZip |
-| Icons | Lucide React, React Icons |
-| Styling | Tailwind CSS v4, CVA, clsx, tailwind-merge |
-| Testing | Vitest, Testing Library |
+## Getting started
 
-## Getting Started
+### Requirements
 
-### Prerequisites
+- Node.js 22+
+- npm
+- A Supabase project with the frontend-facing Auth and Edge Function APIs
+  configured
 
-- Node.js v22+ and npm
-- A Supabase project (for authentication and backend calls). Without one, the app shell still builds and runs, but auth, generation, dashboard, and admin features require backend connectivity.
-
-### Local Setup
-
-1. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-2. Configure environment variables — copy `.env.example` to `.env`:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Add your public Supabase variables:
-
-   ```text
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-   ```
-
-3. Start the development server:
-
-   ```bash
-   npm run dev
-   ```
-
-   The dev server runs on `http://localhost:3000`.
-
-### Environment Variables
-
-Only two browser-safe variables are required by the client:
-
-| Variable | Description |
-| --- | --- |
-| `VITE_SUPABASE_URL` | Your Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | Your Supabase anon/public key |
-
-Server-side secrets are managed inside the private backend and never enter the browser bundle or this repository.
-
-### Running Tests
+### Install and run
 
 ```bash
-npm run test
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
-### Build
+The development server runs at `http://localhost:3000`.
 
-```bash
-npm run build
+Set only these browser-safe variables in `.env.local`:
+
+```text
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-public-anon-or-publishable-key
 ```
 
-## Available Scripts
+Never put service-role keys, AI provider keys, payment secrets, or Edge
+Function secrets in frontend environment variables.
 
-| Command | Description |
+## Commands
+
+| Command | Purpose |
 | --- | --- |
-| `npm run dev` | Start the Vite dev server on `http://localhost:3000` |
-| `npm run build` | Build the production bundle to `dist/` |
-| `npm run preview` | Preview the production build locally |
-| `npm run test` | Run the Vitest + Testing Library suite |
-| `npm run lint` | Type-check with `tsc --noEmit` |
-| `npm run clean` | Remove the `dist/` build output |
+| `npm run dev` | Start the Vite development server. |
+| `npm run lint` | Type-check the frontend with TypeScript. |
+| `npm run test` | Run the Vitest suite. |
+| `npm run build` | Create the production bundle in `dist/`. |
+| `npm run preview` | Preview the production bundle locally. |
+| `npm run clean` | Remove local build output. |
+| `npm run backup:db` | Create a manual Supabase database export. |
 
-## Project Structure
+## Vercel deployment
 
-<details>
-  <summary><strong>Click to expand</strong></summary>
+This repository is configured as a frontend-only Vite deployment.
+
+- **Framework preset:** Vite
+- **Root directory:** repository root
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+
+Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to Vercel Preview and
+Production environments. After the first deployment, add the Vercel origin to
+Supabase Auth URL Configuration for Google OAuth redirects.
+
+Read the complete [deployment guide](docs/DEPLOYMENT.md).
+
+## Repository structure
 
 ```text
 prdsprint/
-├── .github/                   # Issue & PR templates
-├── docs/                      # Long-form documentation
-├── public/                    # Static assets (logo, manifest)
-├── src/
-│   ├── components/            # UI components (auth, credits, generation, layout, sections, support, ui, effects)
-│   ├── pages/                 # Top-level pages (home, builder, dashboard, checkout, generation, admin)
-│   │   └── wizard/            # Wizard step screens
-│   ├── context/               # Credit & toast providers
-│   ├── lib/                   # Supabase client, credit rules, export helpers
-│   ├── data/                  # Plans, pricing rules, style PRDs
-│   ├── services/              # Admin API client
-│   ├── hooks/                 # Shared hooks
-│   ├── __tests__/             # Vitest + Testing Library tests
-│   ├── App.tsx                # Route tree
-│   └── main.tsx               # Entry point
-├── .env.example
-├── LICENSE
-├── package.json
-└── vite.config.ts
+├── .github/       GitHub workflows and contribution templates
+├── assets/        Repository artwork
+├── docs/          Architecture, deployment, security, and operations docs
+├── public/        Browser-served assets, including the product logo
+├── src/           React application source
+├── scripts/       Cross-platform cleanup and manual backup helpers
+├── .env.example   Safe environment-variable template
+└── package.json   Scripts and dependencies
 ```
 
-</details>
+The `supabase/` directory is intentionally ignored because the deployed
+backend is private and must not be published with the frontend repository.
 
-## Credit System
+## Security and operations
 
-Plans are defined in `src/data/plans/index.ts` (INR, monthly): **Free** (₹0 / 50 credits), **Starter** (₹49 / 200), **Pro** (₹99 / 500), **Ultimate** (₹149 / 900). Generation cost is estimated client-side from platform, complexity, features, style, and tech stack (`src/lib/credits.config.ts`). Final billing is enforced by the private backend, which is the source of truth for balances.
+- Keep browser-safe values limited to the `VITE_` variables.
+- Keep provider and service-role secrets in Supabase Edge Function secrets.
+- Review RLS and RPC authorization before production changes.
+- Use `npm run backup:db` before schema changes on the Free plan.
+- Review [Security](docs/SECURITY.md), [Operations](docs/OPERATIONS.md), and
+  [Troubleshooting](docs/TROUBLESHOOTING.md).
 
-## Documentation
+## Project status
 
-<p align="center">
-  <a href="docs/ARCHITECTURE.md"><img src="https://img.shields.io/badge/Architecture-4572FE?style=for-the-badge" alt="Architecture" /></a>
-  <a href="docs/API.md"><img src="https://img.shields.io/badge/API-4572FE?style=for-the-badge" alt="API" /></a>
-  <a href="docs/DEPLOYMENT.md"><img src="https://img.shields.io/badge/Deployment-4572FE?style=for-the-badge" alt="Deployment" /></a>
-  <a href="docs/SECURITY.md"><img src="https://img.shields.io/badge/Security-4572FE?style=for-the-badge" alt="Security" /></a>
-  <a href="docs/TROUBLESHOOTING.md"><img src="https://img.shields.io/badge/Troubleshooting-4572FE?style=for-the-badge" alt="Troubleshooting" /></a>
-  <a href="docs/CONTRIBUTING.md"><img src="https://img.shields.io/badge/Contributing-4572FE?style=for-the-badge" alt="Contributing" /></a>
-  <a href="docs/FAQ.md"><img src="https://img.shields.io/badge/FAQ-4572FE?style=for-the-badge" alt="FAQ" /></a>
-</p>
-
-## Roadmap
-
-See [ROADMAP.md](docs/ROADMAP.md). The roadmap separates what is already implemented in this public repository from what remains planned — including the real AI generation pipeline, which lives in the private backend.
+The frontend is an active MVP with the generation, credit, dashboard, admin,
+support, and export surfaces implemented. Payment gateway integration is
+intentionally deferred until the core product is stable.
 
 ## Contributing
 
-See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for setup, branch naming, commit style, and the PR process.
-
-## Security
-
-See [SECURITY.md](docs/SECURITY.md) for the security model and responsible disclosure. To report a vulnerability, email ayushrock3006@gmail.com.
+Read [CONTRIBUTING.md](docs/CONTRIBUTING.md), open an issue, or submit a pull
+request. Keep changes focused, avoid committing secrets, and run the available
+checks before proposing a change.
 
 ## License
 
-This project is licensed under the [Apache License 2.0](LICENSE).
-
-<div align="center">
-
-<sub>Built with ❤️ by Ayush Kant</sub>
-
-</div>
+PRDSprint is released under the [Apache License 2.0](LICENSE).
