@@ -109,7 +109,7 @@ function KnowledgeBaseBackground({ activeIndex }: { activeIndex: number | null }
 const faqs = [
   {
     question: "What exactly is generated in the ZIP file?",
-    answer: "You receive a complete structural blueprint including overview.md, features-functionality.md, tech-architecture.md, design-system.md, and a compiled full-prd.pdf."
+    answer: "You receive a structured PRD package including overview.md, features-functionality.md, tech-architecture.md, theme-configuration.md, ui-ux-guidelines.md, and development-roadmap.md."
   },
   {
     question: "How is this different from asking ChatGPT?",

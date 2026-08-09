@@ -1,13 +1,11 @@
 import { motion } from "motion/react";
+import { BrandIcon } from "@/components/ui/BrandIcon";
 
 const logos1 = [
-  { name: "Claude Code", icon: <div className="text-orange-500 font-serif font-bold text-xl leading-none">*</div> },
-  { name: "Antigravity", icon: <div className="text-blue-400 font-bold text-xl italic leading-none">A</div> },
-  { name: "OpenCode", icon: <div className="w-5 h-5 border-2 border-white rounded-[4px] flex items-center justify-center"><div className="w-2 h-2 bg-white rounded-[1px]"></div></div> },
-  { name: "Windsurf", icon: <div className="text-teal-400 font-bold text-xl leading-none">W</div> },
-  { name: "v0", icon: <div className="text-white font-bold text-lg leading-none tracking-normal">v0</div> },
-  { name: "Bolt.new", icon: <div className="text-yellow-400 font-bold text-lg leading-none italic">bolt</div> },
-  { name: "Replit", icon: <div className="grid grid-cols-2 gap-0.5"><div className="w-2 h-2 bg-orange-500 rounded-sm"></div><div className="w-2 h-2 bg-orange-500 rounded-sm"></div><div className="w-2 h-2 bg-orange-500 rounded-sm"></div></div> },
+  ...["Claude Code", "OpenCode", "Windsurf", "v0", "Replit"].map((name) => ({
+    name,
+    icon: <BrandIcon name={name} className="w-5 h-5" />,
+  })),
 ];
 
 export function TrustStrip() {

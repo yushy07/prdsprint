@@ -139,7 +139,7 @@ function DeveloperPackage({ pulse, className }: { pulse?: boolean, className?: s
           <Package size={24} className="text-cyan-400" />
         </div>
         <div>
-          <h3 className="text-white font-medium text-[15px]">PRDSprint_Package.zip</h3>
+          <h3 className="text-white font-medium text-[15px]">PRDSprint_PRD_Package.zip</h3>
           <p className="text-cyan-400/80 text-[11px] font-mono mt-1 tracking-wider uppercase">Ready for production</p>
         </div>
       </div>
@@ -148,8 +148,8 @@ function DeveloperPackage({ pulse, className }: { pulse?: boolean, className?: s
         <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors"><FileText size={14} /> ├── overview.md</div>
         <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors"><FileText size={14} /> ├── features-functionality.md</div>
         <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors"><FileText size={14} /> ├── tech-architecture.md</div>
-        <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors"><FileText size={14} /> ├── design-system.md</div>
-        <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors"><FileText size={14} /> └── full-prd.pdf</div>
+        <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors"><FileText size={14} /> ├── theme-configuration.md</div>
+        <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors"><FileText size={14} /> └── development-roadmap.md</div>
       </div>
     </motion.div>
   );
@@ -396,4 +396,3 @@ export function ProblemAndStructure() {
     </section>
   );
 }
-

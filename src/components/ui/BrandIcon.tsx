@@ -3,7 +3,7 @@ import {
   SiReact, SiNextdotjs, SiVuedotjs, SiSvelte, SiKotlin, SiJetpackcompose,
   SiFlutter, SiFirebase, SiSupabase, SiNodedotjs, SiPhp, SiMysql,
   SiPostgresql, SiCursor, SiWindsurf, SiClaudecode, SiClaude, SiAnthropic,
-  SiGooglegemini, SiGithub
+  SiGooglegemini, SiGithub, SiV0, SiReplit, SiOpencode
 } from "react-icons/si";
 
 export function BrandIcon({ name, className = "" }: { name: string, className?: string, key?: string | number }) {
@@ -27,6 +27,9 @@ export function BrandIcon({ name, className = "" }: { name: string, className?: 
     case "Claude": return <SiClaude className={className} />;
     case "Gemini CLI": return <SiGooglegemini className={className} />;
     case "GitHub Copilot": return <SiGithub className={className} />;
+    case "v0": return <SiV0 className={className} />;
+    case "Replit": return <SiReplit className={className} />;
+    case "OpenCode": return <SiOpencode className={className} />;
     default: return null;
   }
 }

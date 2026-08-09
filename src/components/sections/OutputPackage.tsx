@@ -70,11 +70,9 @@ const OUTPUT_FILES = [
   "overview.md",
   "features-functionality.md",
   "tech-architecture.md",
-  "style-guide.md",
   "theme-configuration.md",
   "ui-ux-guidelines.md",
-  "development-roadmap.md",
-  "risks-considerations.md"
+  "development-roadmap.md"
 ];
 
 const AGENTS = ["Cursor", "Claude Code", "Gemini CLI", "OpenAI Codex", "Windsurf"];
@@ -382,7 +380,7 @@ function PremiumPackagingAnimation() {
               <Package size={22} className="text-cyan-400" />
             </div>
             
-            <div className="font-mono font-bold text-xs sm:text-sm text-white mb-1 relative z-10">PRDSprint_Package.zip</div>
+            <div className="font-mono font-bold text-xs sm:text-sm text-white mb-1 relative z-10">PRDSprint_PRD_Package.zip</div>
             
             <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium mb-3 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 relative z-10 shadow-[0_0_10px_rgba(16,185,129,0.15)]">
               <CheckCircle2 size={12} className="animate-pulse" /> Ready for download
@@ -470,7 +468,7 @@ export function OutputPackage() {
                 
                 <div className="bg-[#0A0A0C]/80 backdrop-blur-md border border-white/10 rounded-xl p-3.5 sm:p-4 font-mono text-[11px] sm:text-xs shadow-xl">
                   <div className="flex items-center gap-2 mb-2.5 text-white font-bold text-xs sm:text-sm">
-                    <FolderOpen size={16} className="text-cyan-400" /> PRDSprint_Package.zip
+                    <FolderOpen size={16} className="text-cyan-400" /> PRDSprint_PRD_Package.zip
                   </div>
                   <div className="flex flex-col gap-1.5">
                     {OUTPUT_FILES.map((file, i) => (
@@ -533,7 +531,7 @@ export function OutputPackage() {
 
               <div className="bg-[#0A0A0C]/80 backdrop-blur-md border border-white/10 rounded-xl p-4 font-mono text-xs shadow-xl">
                 <div className="flex items-center gap-2 mb-3 text-white font-bold text-sm">
-                  <FolderOpen size={16} className="text-cyan-400" /> PRDSprint_Package.zip
+                    <FolderOpen size={16} className="text-cyan-400" /> PRDSprint_PRD_Package.zip
                 </div>
                 <div className="flex flex-col gap-1.5">
                   {OUTPUT_FILES.map((file, i) => (
