@@ -126,10 +126,15 @@ export function Navbar() {
                   <CreditBadge credits={remainingCredits} className="hover:bg-cyan-500/20 transition-colors" />
                 </Link>
 
-                {!isAdmin && remainingCredits < 50 && (
+                {!isAdmin && remainingCredits < 30 && (
                   <Link to="/dashboard" className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[11px] font-bold text-amber-400 hover:bg-amber-500/20 transition-colors">
                     <AlertTriangle size={12} />
                     <span>Low Credits</span>
+                  </Link>
+                )}
+                {!isAdmin && remainingCredits >= 30 && (
+                  <Link to="/checkout" className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[11px] font-bold text-cyan-300 hover:bg-cyan-500/20 transition-colors">
+                    <span>Top Up</span>
                   </Link>
                 )}
               </div>
