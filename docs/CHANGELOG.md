@@ -2,6 +2,17 @@
 
 All notable changes to PRDSprint are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and releases follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased] — 2026-08-09
+
+### Improved
+
+- Added normalized Supabase admin dashboard snapshot metrics.
+- Added server-side pagination for users, generations, credits, and audit logs.
+- Added stuck-generation operational state and age classification.
+- Added audit-log and credit-ledger CSV export.
+- Added system settings history and administrator restore support.
+- Updated deployment and free-plan operations guidance for Preview testing.
+
 ## [1.0.0] — 2026-08-07
 
 ### Added

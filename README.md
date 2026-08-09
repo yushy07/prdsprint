@@ -205,8 +205,12 @@ backend is private and must not be published with the frontend repository.
 ## Project status
 
 The frontend is an active MVP with the generation, credit, dashboard, admin,
-support, and export surfaces implemented. Payment gateway integration is
-intentionally deferred until the core product is stable.
+support, and export surfaces implemented. The admin console now uses
+server-side pagination, normalized overview metrics, stuck-generation
+detection, audit/ledger CSV export, and settings history with restore support.
+Payment gateway integration is intentionally deferred until the core product
+is stable. Before public launch, complete the browser smoke test and confirm
+the Vercel build in the deployment environment.
 
 ## Contributing
 

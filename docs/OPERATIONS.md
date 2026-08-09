@@ -30,6 +30,18 @@ status, error code, error message, provider usage, duration, and refund fields.
 Use the admin generations and system-health screens to review failures before
 deleting or retrying anything.
 
+The admin console reads paginated server-side responses for users, generations,
+credits, and audit logs. Use the generation `stuck` state to investigate jobs
+older than the configured timeout. Export audit or ledger CSV files when an
+incident needs an offline record. Settings changes are recorded in
+`system_setting_history` and can be restored from the Settings screen with an
+administrative reason.
+
+The Security Advisor should have zero errors. Warnings about authenticated
+users being able to execute `SECURITY DEFINER` admin functions are expected for
+the admin API only when those functions independently verify `auth.uid()` and
+the administrator role; review them after every backend migration.
+
 ## Free-plan pausing
 
 Supabase Free projects can pause after prolonged inactivity. This is platform

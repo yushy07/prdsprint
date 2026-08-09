@@ -74,3 +74,16 @@ The application has no `/auth/callback` route — after OAuth the client lands b
 - [ ] `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set in the host environment.
 - [ ] Google OAuth redirect URLs are configured in Supabase Auth settings.
 - [ ] No server secrets, service-role keys, or `.env` files are exposed in the build output.
+
+If local test/build commands fail with a Windows `esbuild` access-denied
+message, rerun them in a clean terminal or use the Vercel Preview build as the
+deployment verification. Do not mark the application production-ready until
+the Preview build and the manual admin smoke test pass.
+
+## Admin smoke test
+
+After deploying a Preview, verify that an administrator can load Overview,
+Users, Generations, Credits, Audit Logs, System Health, Providers, and Settings.
+Check search, pagination, CSV export, stuck-generation labels, one safe test
+mutation, and settings-history restore. Verify a normal user cannot access the
+admin routes or call privileged RPCs.
