@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   LayoutDashboard,
@@ -22,6 +23,7 @@ import {
   Lock
 } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
+import { adminApi } from '@/services/admin/api';
 
 export function AdminLayout() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
@@ -34,6 +36,12 @@ export function AdminLayout() {
   const location = useLocation();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
+  const { data: liveHealth } = useQuery({
+    queryKey: ['adminSystemHealth'],
+    queryFn: adminApi.getSystemHealth,
+    refetchInterval: 60_000,
+    staleTime: 30_000,
+  });
 
   const checkAdminAuth = useCallback(async () => {
     try {
@@ -50,7 +58,7 @@ export function AdminLayout() {
 
       // 2. Call authoritative backend is_admin() RPC check with user_id parameter signature
       let isUserAdmin = false;
-      const { data: rpcData, error: adminRpcError } = await supabase.rpc('is_admin', { user_id: session.user.id });
+      const { data: rpcData, error: adminRpcError } = await supabase.rpc('is_admin');
       if (!adminRpcError && rpcData !== null && rpcData !== undefined) {
         isUserAdmin = Boolean(rpcData);
       }
@@ -243,21 +251,23 @@ export function AdminLayout() {
                   >
                     <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
                       <h4 className="text-xs font-bold text-white uppercase tracking-wider">System Status</h4>
-                      <span className="text-[10px] text-emerald-400 font-medium">All Systems Operational</span>
+                      <span className={`text-[10px] font-medium ${liveHealth?.database_status === 'healthy' && liveHealth.storage_status === 'healthy' ? 'text-emerald-400' : 'text-amber-400'}`}>
+                        {liveHealth?.database_status === 'healthy' && liveHealth.storage_status === 'healthy' ? 'All Systems Operational' : 'Attention Required'}
+                      </span>
                     </div>
                     <div className="space-y-2.5 text-xs">
                       <div className="flex items-start gap-2.5 p-2 rounded bg-white/5">
-                        <CheckCircle2 size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                        <CheckCircle2 size={14} className={liveHealth?.database_status === 'healthy' ? 'text-emerald-400 shrink-0 mt-0.5' : 'text-amber-400 shrink-0 mt-0.5'} />
                         <div>
-                          <p className="text-gray-200 font-medium">RPC RPC Integrity Active</p>
-                          <p className="text-[10px] text-gray-400">Session verified via Supabase auth.</p>
+                          <p className="text-gray-200 font-medium">Database: {liveHealth?.database_status || 'checking'}</p>
+                          <p className="text-[10px] text-gray-400">Last checked {liveHealth?.last_checked ? new Date(liveHealth.last_checked).toLocaleTimeString() : 'not available'}.</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-2.5 p-2 rounded bg-white/5">
                         <AlertTriangle size={14} className="text-amber-400 shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-gray-200 font-medium">Audit Logging</p>
-                          <p className="text-[10px] text-gray-400">All administrative mutations are logged.</p>
+                          <p className="text-gray-200 font-medium">Storage: {liveHealth?.storage_status || 'checking'}</p>
+                          <p className="text-[10px] text-gray-400">Pending generations: {liveHealth?.pending_generations ?? '—'}.</p>
                         </div>
                       </div>
                     </div>

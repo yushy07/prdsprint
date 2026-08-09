@@ -1,5 +1,25 @@
 import { supabase } from '@/lib/supabase';
 
+const ADMIN_SETTING_KEYS = new Set([
+  'generation_price',
+  'signup_credits',
+  'retry_limit',
+  'maintenance_mode',
+  'export_expiry',
+]);
+
+const requireReason = (reason: string, action: string) => {
+  const value = reason.trim();
+  if (value.length < 3) throw new Error(`A reason is required to ${action}`);
+  if (value.length > 500) throw new Error('Administrative reasons must be 500 characters or fewer');
+  return value;
+};
+
+const requirePositiveInteger = (amount: number, label: string) => {
+  if (!Number.isInteger(amount) || amount <= 0) throw new Error(`${label} must be a positive whole number`);
+  return amount;
+};
+
 // Types
 export interface AdminStats {
   total_users: number;
@@ -143,7 +163,7 @@ export const adminApi = {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session || !session.user) return false;
 
-      const { data, error } = await supabase.rpc('is_admin', { user_id: session.user.id });
+      const { data, error } = await supabase.rpc('is_admin');
       if (!error && data !== null && data !== undefined) {
         return Boolean(data);
       }
@@ -204,31 +224,32 @@ export const adminApi = {
   },
 
   addCredits: async (userId: string, amount: number, reason: string): Promise<void> => {
-    if (!reason || !reason.trim()) throw new Error('A reason is required to add credits');
-    const { error } = await supabase.rpc('admin_add_credits', { p_user_id: userId, p_amount: amount, p_description: reason });
+    const description = requireReason(reason, 'add credits');
+    const { error } = await supabase.rpc('admin_add_credits', { p_user_id: userId, p_amount: requirePositiveInteger(amount, 'Credit amount'), p_description: description });
     if (error) throw error;
   },
 
   removeCredits: async (userId: string, amount: number, reason: string): Promise<void> => {
-    if (!reason || !reason.trim()) throw new Error('A reason is required to remove credits');
-    const { error } = await supabase.rpc('admin_remove_credits', { p_user_id: userId, p_amount: amount, p_description: reason });
+    const description = requireReason(reason, 'remove credits');
+    const { error } = await supabase.rpc('admin_remove_credits', { p_user_id: userId, p_amount: requirePositiveInteger(amount, 'Credit amount'), p_description: description });
     if (error) throw error;
   },
 
   setCredits: async (userId: string, amount: number, reason: string): Promise<void> => {
-    if (!reason || !reason.trim()) throw new Error('A reason is required to adjust balance');
-    const { error } = await supabase.rpc('admin_set_credits', { p_user_id: userId, p_amount: amount, p_description: reason });
+    const description = requireReason(reason, 'adjust the balance');
+    if (!Number.isInteger(amount) || amount < 0) throw new Error('Credit balance must be a non-negative whole number');
+    const { error } = await supabase.rpc('admin_set_credits', { p_user_id: userId, p_amount: amount, p_description: description });
     if (error) throw error;
   },
 
   banUser: async (userId: string, reason: string): Promise<void> => {
-    if (!reason || !reason.trim()) throw new Error('A reason is required to ban a user');
-    const { error } = await supabase.rpc('admin_ban_user', { p_user_id: userId, p_reason: reason });
+    const p_reason = requireReason(reason, 'ban a user');
+    const { error } = await supabase.rpc('admin_ban_user', { p_user_id: userId, p_reason });
     if (error) throw error;
   },
 
   unbanUser: async (userId: string, reason: string): Promise<void> => {
-    if (!reason || !reason.trim()) throw new Error('A reason is required to unban a user');
+    requireReason(reason, 'unban a user');
     const { error } = await supabase.rpc('admin_unban_user', { p_user_id: userId });
     if (error) throw error;
   },
@@ -259,6 +280,7 @@ export const adminApi = {
   },
 
   retryGeneration: async (generationId: string, reason?: string): Promise<void> => {
+    requireReason(reason || '', 'retry a generation');
     const { error } = await supabase.rpc('admin_retry_generation', { 
       p_generation_id: generationId
     });
@@ -349,16 +371,16 @@ export const adminApi = {
       const { data, error } = await supabase.rpc('system_health');
       if (error) throw error;
       return data || {
-        database_status: 'healthy',
-        storage_status: 'healthy',
+        database_status: 'unknown',
+        storage_status: 'unknown',
         pending_generations: 0,
         last_checked: new Date().toISOString()
       };
     } catch (err: any) {
       console.error('getSystemHealth error:', err);
       return {
-        database_status: 'degraded',
-        storage_status: 'degraded',
+        database_status: 'unknown',
+        storage_status: 'unknown',
         pending_generations: 0,
         last_checked: new Date().toISOString()
       };
@@ -393,9 +415,14 @@ export const adminApi = {
   },
 
   updateSetting: async (key: string, value: any): Promise<void> => {
+    if (!ADMIN_SETTING_KEYS.has(key)) throw new Error('This setting is not editable from the admin console');
+    if (key === 'maintenance_mode' && typeof value !== 'boolean') throw new Error('Maintenance mode must be true or false');
+    if (key !== 'maintenance_mode' && (!Number.isInteger(Number(value)) || Number(value) < 0)) {
+      throw new Error('Numeric settings must be non-negative whole numbers');
+    }
     const { error } = await supabase.rpc('update_setting', {
       p_key: key,
-      p_value: value,
+      p_value: key === 'maintenance_mode' ? Boolean(value) : Number(value),
     });
     if (error) throw error;
   }

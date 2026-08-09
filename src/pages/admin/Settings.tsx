@@ -38,7 +38,17 @@ export function Settings() {
   });
 
   const handleSave = (key: string) => {
-    updateMutation.mutate({ key, value: localSettings[key] });
+    const value = localSettings[key];
+    if (key === 'maintenance_mode') {
+      updateMutation.mutate({ key, value: value === 'true' });
+      return;
+    }
+    const parsed = Number(value);
+    if (!Number.isInteger(parsed) || parsed < 0) {
+      showToast({ type: 'error', message: 'Enter a non-negative whole number before saving.' });
+      return;
+    }
+    updateMutation.mutate({ key, value: parsed });
   };
 
   const handleChange = (key: string, value: string) => {
@@ -119,4 +129,3 @@ export function Settings() {
     </div>
   );
 }
-

@@ -19,6 +19,7 @@ import { useToast } from '@/context/ToastContext';
 import { motion, AnimatePresence } from 'motion/react';
 
 type ActionType = 'verify' | 'refund' | 'resync' | null;
+const PAYMENT_GATEWAY_ENABLED = false;
 
 export function Payments() {
   const [search, setSearch] = useState('');
@@ -93,9 +94,16 @@ export function Payments() {
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Payments & Subscriptions</h1>
           <p className="text-xs text-gray-400 mt-1">
-            Verify payment webhooks, issue refunds, and resync transaction statuses with gateway ledgers.
+            Payment gateway integration is deferred until the product is stable. Existing records remain view-only for now.
           </p>
         </div>
+      </div>
+
+      <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-300">
+        <AlertCircle size={18} className="shrink-0 mt-0.5 text-amber-400" />
+        <p className="text-[11px] leading-relaxed">
+          <strong>Gateway actions disabled:</strong> verification, refunds, and resync will be enabled only after a payment provider is integrated and tested.
+        </p>
       </div>
 
       {/* Search & Filter Bar */}
@@ -204,7 +212,8 @@ export function Payments() {
                             setActiveAction('verify');
                             setModalReason('');
                           }}
-                          className="p-1.5 text-gray-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors cursor-pointer"
+                          disabled={!PAYMENT_GATEWAY_ENABLED}
+                          className="p-1.5 text-gray-400 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                           title="Verify Payment"
                         >
                           <CheckCircle size={15} />
@@ -216,7 +225,8 @@ export function Payments() {
                             setActiveAction('refund');
                             setModalReason('');
                           }}
-                          className="p-1.5 text-gray-400 hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors cursor-pointer"
+                          disabled={!PAYMENT_GATEWAY_ENABLED}
+                          className="p-1.5 text-gray-400 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                           title="Issue Refund"
                         >
                           <RefreshCcw size={15} />
@@ -228,7 +238,8 @@ export function Payments() {
                             setActiveAction('resync');
                             setModalReason('');
                           }}
-                          className="p-1.5 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
+                          disabled={!PAYMENT_GATEWAY_ENABLED}
+                          className="p-1.5 text-gray-400 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                           title="Resync Gateway State"
                         >
                           <RotateCw size={15} />
@@ -356,4 +367,3 @@ export function Payments() {
     </div>
   );
 }
-

@@ -33,26 +33,31 @@ export function Overview() {
   const { data: stats, isLoading: isStatsLoading, error: statsError } = useQuery({
     queryKey: ['adminOverviewStats'],
     queryFn: adminApi.getOverviewStats,
+    refetchInterval: 60_000,
   });
 
   const { data: dailyStats, isLoading: isDailyLoading } = useQuery({
     queryKey: ['adminDailyStats'],
     queryFn: adminApi.getDailyStats,
+    refetchInterval: 300_000,
   });
 
   const { data: providerStats, isLoading: isProviderLoading } = useQuery({
     queryKey: ['adminProviderStats'],
     queryFn: adminApi.getProviderStats,
+    refetchInterval: 60_000,
   });
 
   const { data: recentLogs, isLoading: isLogsLoading } = useQuery({
     queryKey: ['adminRecentLogs'],
     queryFn: adminApi.getAuditLogs,
+    refetchInterval: 60_000,
   });
 
   const { data: systemHealth, isLoading: isHealthLoading } = useQuery({
     queryKey: ['adminSystemHealth'],
     queryFn: adminApi.getSystemHealth,
+    refetchInterval: 60_000,
   });
 
   const statCards = [
@@ -74,6 +79,12 @@ export function Overview() {
     Failed: item.failed || 0,
     Credits: item.credits_used || 0,
   }));
+
+  const healthBadgeClass = (status?: string) => status === 'healthy'
+    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+    : status === 'unknown'
+    ? 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+    : 'bg-amber-500/10 text-amber-400 border-amber-500/20';
 
   return (
     <div className="space-y-8">
@@ -185,15 +196,15 @@ export function Overview() {
               <div className="space-y-3">
                 <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
                   <span className="text-xs text-gray-400">Database Status</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 capitalize">
-                    {systemHealth?.database_status || 'Healthy'}
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border capitalize ${healthBadgeClass(systemHealth?.database_status)}`}>
+                    {systemHealth?.database_status || 'unknown'}
                   </span>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
                   <span className="text-xs text-gray-400">Storage Buckets</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 capitalize">
-                    {systemHealth?.storage_status || 'Healthy'}
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border capitalize ${healthBadgeClass(systemHealth?.storage_status)}`}>
+                    {systemHealth?.storage_status || 'unknown'}
                   </span>
                 </div>
 
