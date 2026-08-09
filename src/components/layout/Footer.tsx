@@ -1,15 +1,17 @@
 // @ts-nocheck
 import { motion, useMotionValue, useTransform } from "motion/react";
-import { Twitter, Github, FileText, Shield } from "lucide-react";
+import { Instagram, Github, FileText, Shield } from "lucide-react";
 import { useState } from "react";
 
-function FooterLink({ icon: Icon, text, variant = 'full' }: { icon: any, text: string, variant?: 'full' | 'compact' }) {
+function FooterLink({ icon: Icon, text, href, external = false, variant = 'full' }: { icon: any, text: string, href: string, external?: boolean, variant?: 'full' | 'compact' }) {
   const [isHovered, setIsHovered] = useState(false);
   
   if (variant === 'compact') {
     return (
       <a 
-        href="#" 
+        href={href}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noreferrer' : undefined}
         className="group relative flex items-center gap-2 text-[13px] font-medium text-gray-500 hover:text-white transition-colors duration-300 py-1"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -22,7 +24,9 @@ function FooterLink({ icon: Icon, text, variant = 'full' }: { icon: any, text: s
 
   return (
     <a 
-      href="#" 
+      href={href}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noreferrer' : undefined}
       className="group relative flex items-center justify-center gap-2 text-[14px] font-medium text-gray-400 hover:text-white transition-colors duration-300"
       style={{ height: '61px' }}
       onMouseEnter={() => setIsHovered(true)}
@@ -70,10 +74,10 @@ export function Footer({ variant = 'full' }: { variant?: 'full' | 'compact' }) {
 
             {/* Links */}
             <div className="flex items-center gap-6">
-              <FooterLink icon={Twitter} text="Twitter" variant="compact" />
-              <FooterLink icon={Github} text="GitHub" variant="compact" />
-              <FooterLink icon={FileText} text="Terms" variant="compact" />
-              <FooterLink icon={Shield} text="Privacy" variant="compact" />
+              <FooterLink icon={Instagram} text="Instagram" href="https://www.instagram.com/void.yushy?igsh=MXNhaXNqajYyeWV3cA==" external variant="compact" />
+              <FooterLink icon={Github} text="GitHub" href="https://github.com/yushy07/prdsprint.git" external variant="compact" />
+              <FooterLink icon={FileText} text="Terms" href="/terms" variant="compact" />
+              <FooterLink icon={Shield} text="Privacy" href="/privacy" variant="compact" />
             </div>
           </div>
         </div>
@@ -146,10 +150,10 @@ export function Footer({ variant = 'full' }: { variant?: 'full' | 'compact' }) {
 
             {/* Links */}
             <div className="flex flex-wrap justify-center gap-x-8" style={{ height: '61px' }}>
-              <FooterLink icon={Twitter} text="Twitter" />
-              <FooterLink icon={Github} text="GitHub" />
-              <FooterLink icon={FileText} text="Terms" />
-              <FooterLink icon={Shield} text="Privacy" />
+              <FooterLink icon={Instagram} text="Instagram" href="https://www.instagram.com/void.yushy?igsh=MXNhaXNqajYyeWV3cA==" external />
+              <FooterLink icon={Github} text="GitHub" href="https://github.com/yushy07/prdsprint.git" external />
+              <FooterLink icon={FileText} text="Terms" href="/terms" />
+              <FooterLink icon={Shield} text="Privacy" href="/privacy" />
             </div>
 
           </div>

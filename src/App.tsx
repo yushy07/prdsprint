@@ -12,6 +12,7 @@ import { CreditProvider } from "@/context/CreditContext";
 import { QueryProvider } from "@/components/QueryProvider";
 import { AdminErrorBoundary } from "@/components/admin/AdminErrorBoundary";
 import { AdminLoadingState } from "@/components/admin/AdminPageState";
+import { Legal } from "@/pages/Legal";
 
 const Home = lazy(() => import("@/pages/Home").then(module => ({ default: module.Home })));
 const Dashboard = lazy(() => import("@/pages/Dashboard").then(module => ({ default: module.Dashboard })));
@@ -85,6 +86,8 @@ function AnimatedRoutes() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/builder" element={<Builder />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/terms" element={<Legal />} />
+            <Route path="/privacy" element={<Legal />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminErrorBoundary><AdminLayout /></AdminErrorBoundary>}>
