@@ -37,3 +37,28 @@ export interface LedgerTransactionView {
   description: string;
   created_at: string;
 }
+
+export interface PlanAllowance {
+  id: PlanType;
+  name: string;
+  credits: number;
+  androidUnlocked: boolean;
+}
+
+export interface AdminPlanChangePreview {
+  currentPlan: PlanType;
+  nextPlan: PlanType;
+  currentCredits: number;
+  nextCredits: number;
+  requiresConfirmation: boolean;
+}
+
+export interface AdminPlanChangeResult {
+  previous_plan: PlanType;
+  new_plan: PlanType;
+  previous_credits: number;
+  new_credits: number;
+  audit_log_id: string;
+  request_id: string;
+}
+import type { PlanType } from '@/lib/credits.config';

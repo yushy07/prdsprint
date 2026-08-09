@@ -22,8 +22,9 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { motion, AnimatePresence } from 'motion/react';
+import { PLAN_LIMITS, type PlanType } from '@/lib/credits.config';
 
-type ModalType = 'add_credits' | 'remove_credits' | 'set_credits' | 'ban' | 'unban' | null;
+type ModalType = 'add_credits' | 'remove_credits' | 'set_credits' | 'change_plan' | 'ban' | 'unban' | null;
 
 export function Users() {
   const [search, setSearch] = useState('');
@@ -34,6 +35,8 @@ export function Users() {
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [modalAmount, setModalAmount] = useState<number>(10);
   const [modalReason, setModalReason] = useState<string>('');
+  const [selectedPlan, setSelectedPlan] = useState<PlanType>('free');
+  const [confirmationText, setConfirmationText] = useState('');
 
   const { showToast } = useToast();
   const queryClient = useQueryClient();
@@ -87,6 +90,22 @@ export function Users() {
     onError: (err: Error) => showToast(err.message || 'Failed to update user credits', 'error'),
   });
 
+  const planMutation = useMutation({
+    mutationFn: ({ id, plan, reason }: { id: string; plan: PlanType; reason: string }) =>
+      adminApi.setUserPlan(id, plan, reason, crypto.randomUUID()),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
+      queryClient.invalidateQueries({ queryKey: ['adminUserDetails', result.user.id] });
+      queryClient.invalidateQueries({ queryKey: ['adminOverviewStats'] });
+      queryClient.invalidateQueries({ queryKey: ['adminCreditHistory'] });
+      showToast(`Plan changed to ${result.new_plan}; credits set to ${result.new_credits}.`, 'success');
+      setActiveModal(null);
+      setModalReason('');
+      setConfirmationText('');
+    },
+    onError: (err: Error) => showToast(err.message || 'Failed to change user plan', 'error'),
+  });
+
   const handleModalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUser || !activeModal) return;
@@ -106,6 +125,14 @@ export function Users() {
       creditsMutation.mutate({ id: selectedUser.id, amount: Math.max(1, modalAmount), reason: modalReason, action: 'remove' });
     } else if (activeModal === 'set_credits') {
       creditsMutation.mutate({ id: selectedUser.id, amount: Math.max(0, modalAmount), reason: modalReason, action: 'set' });
+    } else if (activeModal === 'change_plan') {
+      const currentPlan = (selectedUser.plan_tier || 'free') as PlanType;
+      const isDowngrade = PLAN_LIMITS[selectedPlan].credits < PLAN_LIMITS[currentPlan].credits;
+      if (isDowngrade && confirmationText !== 'CONFIRM DOWNGRADE') {
+        showToast('Type CONFIRM DOWNGRADE to approve this change.', 'error');
+        return;
+      }
+      planMutation.mutate({ id: selectedUser.id, plan: selectedPlan, reason: modalReason });
     }
   };
 
@@ -379,6 +406,34 @@ export function Users() {
                   </div>
                 </div>
 
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-bold text-white text-xs uppercase tracking-wider">Plan & Entitlement</h4>
+                    <p className="text-[11px] text-gray-500 mt-1">Admin-granted plans are separate from payment records.</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] text-gray-400">Current plan</p>
+                      <p className="text-sm font-bold text-purple-200 capitalize">{selectedUser.plan_tier || 'free'}</p>
+                    </div>
+                    <p className="text-xs text-gray-300">{selectedUser.credits_balance ?? selectedUser.credits ?? 0} credits</p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={selectedUser.email.toLowerCase() === 'ayushrock3006@gmail.com'}
+                    onClick={() => {
+                      setSelectedPlan((selectedUser.plan_tier || 'free') as PlanType);
+                      setModalReason('');
+                      setConfirmationText('');
+                      setActiveModal('change_plan');
+                    }}
+                    className="w-full p-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-300 font-semibold flex items-center justify-center gap-2 disabled:opacity-40"
+                  >
+                    <ShieldCheck size={17} />
+                    {selectedUser.email.toLowerCase() === 'ayushrock3006@gmail.com' ? 'Your plan is protected' : 'Change plan'}
+                  </button>
+                </div>
+
                 {/* Ban / Unban Security Controls */}
                 <div className="space-y-3">
                   <h4 className="font-bold text-white text-xs uppercase tracking-wider">Access Control</h4>
@@ -439,6 +494,7 @@ export function Users() {
                     {activeModal === 'add_credits' && 'Add Credits'}
                     {activeModal === 'remove_credits' && 'Deduct Credits'}
                     {activeModal === 'set_credits' && 'Set Exact Credit Balance'}
+                    {activeModal === 'change_plan' && 'Change User Plan'}
                   </span>
                 </h3>
                 <button
@@ -456,8 +512,31 @@ export function Users() {
               </div>
 
               <form onSubmit={handleModalSubmit} className="space-y-4">
-                {/* Credit Amount Input */}
-                {['add_credits', 'remove_credits', 'set_credits'].includes(activeModal) && (
+                {activeModal === 'change_plan' ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <p className="text-[10px] text-gray-500">Current</p>
+                        <p className="text-white font-bold capitalize">{selectedUser.plan_tier || 'free'}</p>
+                        <p className="text-gray-400 text-[11px]">{selectedUser.credits_balance ?? selectedUser.credits ?? 0} credits</p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                        <p className="text-[10px] text-purple-300">After change</p>
+                        <select value={selectedPlan} onChange={(e) => setSelectedPlan(e.target.value as PlanType)} className="w-full mt-1 bg-transparent text-white font-bold capitalize focus:outline-none">
+                          {(Object.keys(PLAN_LIMITS) as PlanType[]).map((plan) => <option key={plan} value={plan} className="bg-[#121218]">{PLAN_LIMITS[plan].name} — {PLAN_LIMITS[plan].credits} credits</option>)}
+                        </select>
+                        <p className="text-purple-200 text-[11px]">{PLAN_LIMITS[selectedPlan].credits} credits</p>
+                      </div>
+                    </div>
+                    {PLAN_LIMITS[selectedPlan].credits < PLAN_LIMITS[(selectedUser.plan_tier || 'free') as PlanType].credits && (
+                      <div>
+                        <label className="block text-amber-300 font-semibold mb-1">Type CONFIRM DOWNGRADE</label>
+                        <input value={confirmationText} onChange={(e) => setConfirmationText(e.target.value)} className="w-full px-3 py-2 bg-[#0a0a0f] border border-amber-500/30 rounded-xl text-white" />
+                      </div>
+                    )}
+                  </>
+                ) : ['add_credits', 'remove_credits', 'set_credits'].includes(activeModal) && (
+                /* Credit Amount Input */
                   <div>
                     <label className="block text-gray-300 font-semibold mb-1">
                       {activeModal === 'set_credits' ? 'New Credit Balance:' : 'Credit Amount:'}
@@ -498,7 +577,7 @@ export function Users() {
                   </button>
                   <button
                     type="submit"
-                    disabled={banMutation.isPending || creditsMutation.isPending}
+                    disabled={banMutation.isPending || creditsMutation.isPending || planMutation.isPending}
                     className={`px-5 py-2 rounded-xl text-white font-semibold flex items-center gap-2 cursor-pointer transition-all ${
                       activeModal === 'ban'
                         ? 'bg-red-600 hover:bg-red-700'
@@ -507,10 +586,10 @@ export function Users() {
                         : 'bg-indigo-600 hover:bg-indigo-700'
                     }`}
                   >
-                    {(banMutation.isPending || creditsMutation.isPending) && (
+                    {(banMutation.isPending || creditsMutation.isPending || planMutation.isPending) && (
                       <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     )}
-                    <span>Confirm Action</span>
+                    <span>{activeModal === 'change_plan' ? 'Apply Plan Change' : 'Confirm Action'}</span>
                   </button>
                 </div>
               </form>

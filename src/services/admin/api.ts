@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { GenerationOperationalState, PaginatedResult } from '@/types/admin';
+import type { PlanType } from '@/lib/credits.config';
 
 const unwrapRows = <T,>(value: unknown): T[] => {
   if (Array.isArray(value)) return value as T[];
@@ -190,6 +191,16 @@ export interface SystemSetting {
   updated_by?: string;
 }
 
+export interface AdminPlanChangeResult {
+  user: User;
+  previous_plan: PlanType;
+  new_plan: PlanType;
+  previous_credits: number;
+  new_credits: number;
+  audit_log_id: string;
+  request_id: string;
+}
+
 // API functions with fallback safety
 export const adminApi = {
   checkAdminStatus: async (): Promise<boolean> => {
@@ -288,6 +299,20 @@ export const adminApi = {
     if (!Number.isInteger(amount) || amount < 0) throw new Error('Credit balance must be a non-negative whole number');
     const { error } = await supabase.rpc('admin_set_credits', { p_user_id: userId, p_amount: amount, p_description: description });
     if (error) throw error;
+  },
+
+  setUserPlan: async (userId: string, planTier: PlanType, reason: string, requestId: string): Promise<AdminPlanChangeResult> => {
+    const p_reason = requireReason(reason, 'change a user plan');
+    if (!userId.trim()) throw new Error('A target user is required');
+    if (!requestId.trim()) throw new Error('A request ID is required');
+    const { data, error } = await supabase.rpc('admin_set_user_plan', {
+      p_user_id: userId,
+      p_plan_tier: planTier,
+      p_reason,
+      p_request_id: requestId,
+    });
+    if (error) throw error;
+    return unwrapObject<AdminPlanChangeResult>(data) || data as AdminPlanChangeResult;
   },
 
   banUser: async (userId: string, reason: string): Promise<void> => {
