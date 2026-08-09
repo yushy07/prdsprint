@@ -106,20 +106,31 @@ function AnimatedRoutes() {
   );
 }
 
+function RouteScrollProvider() {
+  const location = useLocation();
+  const content = (
+    <>
+      <ScrollToTop />
+      <AnimatedRoutes />
+    </>
+  );
+
+  // Admin has its own fixed shell and scroll container. Lenis attaches to the
+  // document and would otherwise capture wheel events before that container.
+  return location.pathname.startsWith('/admin') ? content : <SmoothScroll>{content}</SmoothScroll>;
+}
+
 export default function App() {
   return (
     <ThemeProvider defaultTheme="dark">
       <QueryProvider>
-        <SmoothScroll>
-          <ToastProvider>
-            <CreditProvider>
-              <BrowserRouter>
-                <ScrollToTop />
-                <AnimatedRoutes />
-              </BrowserRouter>
-            </CreditProvider>
-          </ToastProvider>
-        </SmoothScroll>
+        <ToastProvider>
+          <CreditProvider>
+            <BrowserRouter>
+              <RouteScrollProvider />
+            </BrowserRouter>
+          </CreditProvider>
+        </ToastProvider>
       </QueryProvider>
     </ThemeProvider>
   );
