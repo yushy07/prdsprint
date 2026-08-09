@@ -26,7 +26,10 @@ export function Providers() {
         ) : !stats || stats.length === 0 ? (
           <div className="col-span-full"><AdminEmptyState title="No provider telemetry yet" message="Provider statistics will appear after generation requests are recorded." /></div>
         ) : (
-          stats.map((provider) => (
+          stats.map((provider) => {
+            const requests = provider.total_requests ?? 0;
+            const successRate = provider.success_rate ?? 0;
+            return (
             <div
               key={provider.provider}
               className="p-5 rounded-2xl bg-[#0f0f13] border border-white/10 flex flex-col justify-between hover:border-white/20 transition-all shadow-xl"
@@ -40,22 +43,22 @@ export function Providers() {
                     <div>
                       <h3 className="text-sm font-bold text-white capitalize">{provider.provider}</h3>
                       <p className="text-[10px] text-gray-400 font-mono">
-                        Requests: {provider.total_requests.toLocaleString()}
+                        Requests: {(provider.total_requests ?? 0).toLocaleString()}
                       </p>
                     </div>
                   </div>
 
                   <span
                     className={`px-2.5 py-0.5 rounded-full border font-semibold text-[10px] flex items-center gap-1 ${
-                      provider.success_rate >= 95
+                      successRate >= 95
                         ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                        : provider.success_rate >= 80
+                      : successRate >= 80
                         ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                         : 'bg-red-500/10 text-red-400 border-red-500/20'
                     }`}
                   >
                     <Activity size={11} />
-                    {provider.total_requests < 10 ? 'Low sample' : `${provider.success_rate.toFixed(1)}%`}
+                    {requests < 10 ? 'Low sample' : `${successRate.toFixed(1)}%`}
                   </span>
                 </div>
 
@@ -64,14 +67,14 @@ export function Providers() {
                     <p className="text-[10px] text-gray-400 mb-1 flex items-center gap-1">
                       <CheckCircle2 size={12} className="text-emerald-400" /> Completed
                     </p>
-                    <p className="text-base font-bold text-white">{provider.completed.toLocaleString()}</p>
+                    <p className="text-base font-bold text-white">{(provider.completed ?? 0).toLocaleString()}</p>
                   </div>
 
                   <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
                     <p className="text-[10px] text-gray-400 mb-1 flex items-center gap-1">
                       <XCircle size={12} className="text-rose-400" /> Failures
                     </p>
-                    <p className="text-base font-bold text-white">{provider.failures.toLocaleString()}</p>
+                    <p className="text-base font-bold text-white">{(provider.failures ?? 0).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
@@ -87,7 +90,8 @@ export function Providers() {
                 </div>
               )}
             </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

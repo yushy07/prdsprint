@@ -211,19 +211,27 @@ export const adminApi = {
 
   getOverviewStats: async (): Promise<AdminStats> => {
     try {
-      const { data, error } = await supabase.rpc('admin_dashboard_snapshot');
+      let { data, error } = await supabase.rpc('admin_dashboard_snapshot');
+      // Keep the dashboard usable while older deployments refresh their RPC/schema cache.
+      // The fallback remains protected by the existing admin RPC authorization.
+      if (error) {
+        const fallback = await supabase.rpc('admin_dashboard_stats');
+        data = fallback.data;
+        error = fallback.error;
+      }
       if (error) throw error;
+      const snapshot: Partial<AdminStats> & { users?: number; generations?: number; payments?: number; completed_payments?: number } = unwrapObject<AdminStats & { users?: number; generations?: number; payments?: number; completed_payments?: number }>(data) || {};
       return {
-        total_users: unwrapObject<AdminStats>(data)?.total_users ?? 0,
-        banned_users: unwrapObject<AdminStats>(data)?.banned_users ?? 0,
-        total_generations: unwrapObject<AdminStats>(data)?.total_generations ?? 0,
-        pending_generations: unwrapObject<AdminStats>(data)?.pending_generations ?? 0,
-        completed_generations: unwrapObject<AdminStats>(data)?.completed_generations ?? 0,
-        failed_generations: unwrapObject<AdminStats>(data)?.failed_generations ?? 0,
-        total_payments: unwrapObject<AdminStats>(data)?.total_payments ?? 0,
-        completed_payments: unwrapObject<AdminStats>(data)?.completed_payments ?? 0,
-        credits_issued: unwrapObject<AdminStats>(data)?.credits_issued ?? 0,
-        credits_consumed: unwrapObject<AdminStats>(data)?.credits_consumed ?? 0,
+        total_users: snapshot.total_users ?? snapshot.users ?? 0,
+        banned_users: snapshot.banned_users ?? 0,
+        total_generations: snapshot.total_generations ?? snapshot.generations ?? 0,
+        pending_generations: snapshot.pending_generations ?? 0,
+        completed_generations: snapshot.completed_generations ?? 0,
+        failed_generations: snapshot.failed_generations ?? 0,
+        total_payments: snapshot.total_payments ?? snapshot.payments ?? 0,
+        completed_payments: snapshot.completed_payments ?? 0,
+        credits_issued: snapshot.credits_issued ?? 0,
+        credits_consumed: snapshot.credits_consumed ?? 0,
       };
     } catch (err: any) {
       console.error('getOverviewStats error:', err);
