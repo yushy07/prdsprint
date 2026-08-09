@@ -192,6 +192,7 @@ export function Generations() {
                   const isProcessing = gen.status === 'processing';
                   const isFailed = gen.status === 'failed';
                   const isPartial = gen.status === 'partial';
+                  const isStuck = isProcessing && Boolean(gen.started_at || gen.created_at) && Date.now() - new Date(gen.started_at || gen.created_at || Date.now()).getTime() > 15 * 60 * 1000;
 
                   return (
                     <tr key={gen.id} className="hover:bg-white/[0.02] transition-colors group">
@@ -219,8 +220,9 @@ export function Generations() {
                           {isProcessing && <Clock size={11} className="animate-spin" />}
                           {isFailed && <XCircle size={11} />}
                           {isPartial && <AlertTriangle size={11} />}
-                          {gen.status}
+                          {isStuck ? 'STUCK' : gen.status}
                         </span>
+                        {isStuck && <span className="ml-2 text-[10px] text-amber-300">Needs review</span>}
                       </td>
 
                       <td className="px-6 py-4">

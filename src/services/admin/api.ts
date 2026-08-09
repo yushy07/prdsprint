@@ -1,5 +1,22 @@
 import { supabase } from '@/lib/supabase';
 
+const unwrapRows = <T,>(value: unknown): T[] => {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === 'object') {
+    const record = value as { data?: unknown; rows?: unknown; results?: unknown };
+    if (Array.isArray(record.data)) return record.data as T[];
+    if (Array.isArray(record.rows)) return record.rows as T[];
+    if (Array.isArray(record.results)) return record.results as T[];
+  }
+  return [];
+};
+
+const unwrapObject = <T,>(value: unknown): T | null => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const record = value as { data?: unknown };
+  return (record.data && typeof record.data === 'object' && !Array.isArray(record.data) ? record.data : value) as T;
+};
+
 const ADMIN_SETTING_KEYS = new Set([
   'generation_price',
   'signup_credits',
@@ -180,16 +197,16 @@ export const adminApi = {
       const { data, error } = await supabase.rpc('admin_dashboard_stats');
       if (error) throw error;
       return {
-        total_users: data?.total_users ?? 0,
-        banned_users: data?.banned_users ?? 0,
-        total_generations: data?.total_generations ?? 0,
-        pending_generations: data?.pending_generations ?? 0,
-        completed_generations: data?.completed_generations ?? 0,
-        failed_generations: data?.failed_generations ?? 0,
-        total_payments: data?.total_payments ?? 0,
-        completed_payments: data?.completed_payments ?? 0,
-        credits_issued: data?.credits_issued ?? 0,
-        credits_consumed: data?.credits_consumed ?? 0,
+        total_users: unwrapObject<AdminStats>(data)?.total_users ?? 0,
+        banned_users: unwrapObject<AdminStats>(data)?.banned_users ?? 0,
+        total_generations: unwrapObject<AdminStats>(data)?.total_generations ?? 0,
+        pending_generations: unwrapObject<AdminStats>(data)?.pending_generations ?? 0,
+        completed_generations: unwrapObject<AdminStats>(data)?.completed_generations ?? 0,
+        failed_generations: unwrapObject<AdminStats>(data)?.failed_generations ?? 0,
+        total_payments: unwrapObject<AdminStats>(data)?.total_payments ?? 0,
+        completed_payments: unwrapObject<AdminStats>(data)?.completed_payments ?? 0,
+        credits_issued: unwrapObject<AdminStats>(data)?.credits_issued ?? 0,
+        credits_consumed: unwrapObject<AdminStats>(data)?.credits_consumed ?? 0,
       };
     } catch (err: any) {
       console.error('getOverviewStats error:', err);
@@ -205,7 +222,7 @@ export const adminApi = {
         p_offset: 0,
       });
       if (error) throw error;
-      return data || [];
+      return unwrapRows<User>(data);
     } catch (err: any) {
       console.error('getUsers error:', err);
       throw err;
@@ -258,7 +275,7 @@ export const adminApi = {
     try {
       const { data, error } = await supabase.rpc('admin_get_credit_history');
       if (error) throw error;
-      return data || [];
+      return unwrapRows<CreditTransaction>(data);
     } catch (err: any) {
       console.error('getCreditHistory error:', err);
       throw err;
@@ -272,7 +289,7 @@ export const adminApi = {
         p_offset: 0,
       });
       if (error) throw error;
-      return data || [];
+      return unwrapRows<Generation>(data);
     } catch (err: any) {
       console.error('getGenerations error:', err);
       throw err;
@@ -300,7 +317,7 @@ export const adminApi = {
     try {
       const { data, error } = await supabase.rpc('admin_get_payments');
       if (error) throw error;
-      return data || [];
+      return unwrapRows<Payment>(data);
     } catch (err: any) {
       console.error('getPayments error:', err);
       throw err;
@@ -326,7 +343,7 @@ export const adminApi = {
     try {
       const { data, error } = await supabase.rpc('admin_get_audit_logs');
       if (error) throw error;
-      return data || [];
+      return unwrapRows<AuditLog>(data);
     } catch (err: any) {
       console.error('getAuditLogs error:', err);
       throw err;
@@ -337,7 +354,7 @@ export const adminApi = {
     try {
       const { data, error } = await supabase.rpc('daily_generation_stats');
       if (error) throw error;
-      return data || [];
+      return unwrapRows<DailyStats>(data);
     } catch (err: any) {
       console.error('getDailyStats error:', err);
       return [];
@@ -348,7 +365,7 @@ export const adminApi = {
     try {
       const { data, error } = await supabase.rpc('provider_statistics');
       if (error) throw error;
-      return data || [];
+      return unwrapRows<ProviderStats>(data);
     } catch (err: any) {
       console.error('getProviderStats error:', err);
       return [];
@@ -370,7 +387,7 @@ export const adminApi = {
     try {
       const { data, error } = await supabase.rpc('system_health');
       if (error) throw error;
-      return data || {
+      return unwrapObject<SystemHealth>(data) || {
         database_status: 'unknown',
         storage_status: 'unknown',
         pending_generations: 0,
