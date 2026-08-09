@@ -97,11 +97,11 @@ export function Navbar() {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-full max-w-6xl px-4"
+      className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-full max-w-7xl px-4"
     >
       <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 border border-white/10 rounded-full bg-[#0A0A0B]/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
         {/* Column 1: Logo */}
-        <div className="flex flex-1 items-center justify-start min-w-0">
+        <div className="flex shrink-0 items-center justify-start min-w-0">
           <a href="/" onClick={(e) => handleNavSection(e, '')} aria-label="PRDSprint Home" className="relative group block flex items-center gap-2">
             <img src="/logo.svg" alt="PRDSprint" className="w-auto h-10 sm:h-12 md:h-14 object-contain transition-transform duration-500 group-hover:scale-105" />
             <span className="text-xl font-bold tracking-[-0.01em] text-white" style={{ wordSpacing: '0.05em' }}>
@@ -111,12 +111,12 @@ export function Navbar() {
         </div>
         
         {/* Column 2: Centered Links */}
-        <div className="hidden md:flex items-center justify-center gap-4 lg:gap-8 text-[13px] font-medium tracking-wide whitespace-nowrap">
+        <div className="hidden md:flex flex-1 items-center justify-center gap-4 lg:gap-6 xl:gap-8 px-4 text-[13px] font-medium tracking-wide whitespace-nowrap">
           <NavLinks />
         </div>
 
         {/* Column 3: Right Side */}
-        <div className="flex flex-1 items-center justify-end gap-3 sm:gap-4 min-w-0">
+        <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3 min-w-0">
           {session ? (
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-1.5 sm:gap-2">

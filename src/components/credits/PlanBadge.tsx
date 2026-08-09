@@ -15,9 +15,9 @@ export function PlanBadge({ plan, isAdmin: propIsAdmin, className = '' }: PlanBa
 
   if (activeIsAdmin) {
     return (
-      <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[13px] font-bold tracking-wide uppercase bg-purple-500/20 text-purple-300 border-purple-500/40 ${className}`}>
+      <div title="Administrator" className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-bold tracking-wide uppercase whitespace-nowrap bg-purple-500/20 text-purple-300 border-purple-500/40 ${className}`}>
         <ShieldCheck size={13} className="text-purple-400" />
-        <span>Administrator</span>
+        <span>Admin</span>
       </div>
     );
   }
