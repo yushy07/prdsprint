@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/services/admin/api';
-import { Save, AlertCircle, Sliders, ShieldAlert } from 'lucide-react';
+import { Save, AlertCircle, History, RotateCcw } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 
 export function Settings() {
@@ -14,13 +14,25 @@ export function Settings() {
     queryFn: adminApi.getSettings,
   });
 
+  const { data: settingHistory } = useQuery({
+    queryKey: ['adminSettingHistory'],
+    queryFn: () => adminApi.getSettingHistory(null, 1, 20),
+  });
+
   useEffect(() => {
     if (settings && Array.isArray(settings)) {
       const initial: Record<string, string> = {};
       settings.forEach((s) => {
         const keyName = s.key || s.setting_key;
         if (keyName) {
-          const rawVal = s.value ?? s.setting_value ?? '';
+          const defaults: Record<string, string | number | boolean> = {
+            generation_price: 30,
+            signup_credits: 50,
+            retry_limit: 3,
+            maintenance_mode: false,
+            export_expiry: 24,
+          };
+          const rawVal = s.value ?? s.setting_value ?? defaults[keyName] ?? '';
           initial[keyName] = typeof rawVal === 'object' ? JSON.stringify(rawVal) : String(rawVal);
         }
       });
@@ -126,6 +138,47 @@ export function Settings() {
           <strong>Notice:</strong> Configuration modifications apply in real-time across all active Edge Function workers and frontend sessions. Modifying credit costs or maintenance mode will directly impact active users.
         </p>
       </div>
+
+      <section className="bg-[#0f0f13] border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+        <div className="px-5 py-4 border-b border-white/10 flex items-center gap-2">
+          <History size={16} className="text-indigo-400" />
+          <div>
+            <h2 className="text-sm font-bold text-white">Settings history</h2>
+            <p className="text-[11px] text-gray-500">Every change is recorded so you can identify and restore a previous value.</p>
+          </div>
+        </div>
+        <div className="divide-y divide-white/5">
+          {(settingHistory?.data ?? []).length === 0 ? (
+            <p className="p-5 text-gray-500">No setting changes recorded yet.</p>
+          ) : (settingHistory?.data ?? []).map((item) => (
+            <div key={String(item.id)} className="px-5 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <p className="text-white font-semibold">{String(item.setting_key ?? 'setting')}</p>
+                <p className="text-[11px] text-gray-500">{item.changed_at ? new Date(String(item.changed_at)).toLocaleString() : 'Unknown time'} · {String(item.changed_by_email ?? 'Administrator')}</p>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  const reason = window.prompt('Reason for restoring this setting:');
+                  if (reason) {
+                    try {
+                      await adminApi.restoreSetting(String(item.id), reason);
+                      queryClient.invalidateQueries({ queryKey: ['adminSettings'] });
+                      queryClient.invalidateQueries({ queryKey: ['adminSettingHistory'] });
+                      showToast({ type: 'success', message: 'Setting restored successfully' });
+                    } catch (error) {
+                      showToast({ type: 'error', message: error instanceof Error ? error.message : 'Failed to restore setting' });
+                    }
+                  }
+                }}
+                className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-200 flex items-center gap-2"
+              >
+                <RotateCcw size={13} /> Restore
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

@@ -40,8 +40,8 @@ export function Generations() {
 
   // Fetch Generations
   const { data: generations, isLoading } = useQuery({
-    queryKey: ['adminGenerations'],
-    queryFn: adminApi.getGenerations,
+    queryKey: ['adminGenerations', search, statusFilter, page],
+    queryFn: () => adminApi.getGenerationsPage(search, statusFilter === 'all' ? null : statusFilter, page, pageSize),
   });
 
   // Retry Mutation
@@ -91,23 +91,8 @@ export function Generations() {
   };
 
   // Filter & Pagination
-  const filteredGenerations = (generations || []).filter((gen) => {
-    const q = search.toLowerCase();
-    const matchesSearch =
-      (gen.user_email && gen.user_email.toLowerCase().includes(q)) ||
-      (gen.id && gen.id.toLowerCase().includes(q)) ||
-      (gen.platform && gen.platform.toLowerCase().includes(q)) ||
-      (gen.provider_used && gen.provider_used.toLowerCase().includes(q)) ||
-      (gen.error_details && gen.error_details.toLowerCase().includes(q));
-
-    const matchesStatus =
-      statusFilter === 'all' || gen.status.toLowerCase() === statusFilter.toLowerCase();
-
-    return matchesSearch && matchesStatus;
-  });
-
-  const totalPages = Math.max(1, Math.ceil(filteredGenerations.length / pageSize));
-  const currentPageItems = filteredGenerations.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.max(1, Math.ceil((generations?.total ?? 0) / pageSize));
+  const currentPageItems = generations?.data ?? [];
 
   return (
     <div className="space-y-6 text-xs">
@@ -269,7 +254,7 @@ export function Generations() {
         {/* Pagination Bar */}
         <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between text-gray-400">
           <span>
-            Showing {currentPageItems.length} of {filteredGenerations.length} records
+            Showing {currentPageItems.length} of {generations?.total ?? 0} records
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -284,7 +269,7 @@ export function Generations() {
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
+              disabled={page >= totalPages || !generations?.has_more}
               className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white disabled:opacity-30 cursor-pointer"
             >
               <ChevronRight size={16} />

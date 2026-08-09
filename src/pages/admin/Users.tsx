@@ -40,8 +40,8 @@ export function Users() {
 
   // Fetch Users
   const { data: users, isLoading } = useQuery({
-    queryKey: ['adminUsers', search],
-    queryFn: () => adminApi.getUsers(search),
+    queryKey: ['adminUsers', search, page],
+    queryFn: () => adminApi.getUsersPage(search, page, pageSize),
   });
 
   // Fetch Detailed User Info when selected
@@ -110,18 +110,8 @@ export function Users() {
   };
 
   // Filter & Pagination
-  const filteredUsers = (users || []).filter((u) => {
-    const q = search.toLowerCase();
-    const userName = u.name || u.full_name;
-    return (
-      u.email.toLowerCase().includes(q) ||
-      (userName && userName.toLowerCase().includes(q)) ||
-      u.id.toLowerCase().includes(q)
-    );
-  });
-
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / pageSize));
-  const currentPageUsers = filteredUsers.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.max(1, Math.ceil((users?.total ?? 0) / pageSize));
+  const currentPageUsers = users?.data ?? [];
 
   return (
     <div className="space-y-6">
@@ -234,7 +224,7 @@ export function Users() {
         {/* Pagination Bar */}
         <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
           <span>
-            Showing {currentPageUsers.length} of {filteredUsers.length} users
+            Showing {currentPageUsers.length} of {users?.total ?? 0} users
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -249,7 +239,7 @@ export function Users() {
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
+              disabled={page >= totalPages || !users?.has_more}
               className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white disabled:opacity-30 cursor-pointer"
             >
               <ChevronRight size={16} />

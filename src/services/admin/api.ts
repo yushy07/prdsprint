@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import type { GenerationOperationalState, PaginatedResult } from '@/types/admin';
 
 const unwrapRows = <T,>(value: unknown): T[] => {
   if (Array.isArray(value)) return value as T[];
@@ -15,6 +16,18 @@ const unwrapObject = <T,>(value: unknown): T | null => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const record = value as { data?: unknown };
   return (record.data && typeof record.data === 'object' && !Array.isArray(record.data) ? record.data : value) as T;
+};
+
+const unwrapPage = <T,>(value: unknown): PaginatedResult<T> => {
+  const record = (value && typeof value === 'object' && !Array.isArray(value) ? value : {}) as Partial<PaginatedResult<T>> & { rows?: T[]; results?: T[] };
+  const data = Array.isArray(record.data) ? record.data : Array.isArray(record.rows) ? record.rows : Array.isArray(record.results) ? record.results : [];
+  return {
+    data: data as T[],
+    total: Number(record.total ?? data.length),
+    page: Number(record.page ?? 1),
+    page_size: Number(record.page_size ?? data.length),
+    has_more: Boolean(record.has_more ?? false),
+  };
 };
 
 const ADMIN_SETTING_KEYS = new Set([
@@ -109,6 +122,8 @@ export interface Generation {
   provider_used?: string;
   failed_sections?: string[];
   user_email?: string;
+  operational_state?: GenerationOperationalState;
+  age_seconds?: number;
 }
 
 export interface Payment {
@@ -171,6 +186,8 @@ export interface SystemSetting {
   value?: string | number | boolean | Record<string, unknown>;
   setting_value?: string | number | boolean | Record<string, unknown>;
   description?: string;
+  updated_at?: string;
+  updated_by?: string;
 }
 
 // API functions with fallback safety
@@ -194,7 +211,7 @@ export const adminApi = {
 
   getOverviewStats: async (): Promise<AdminStats> => {
     try {
-      const { data, error } = await supabase.rpc('admin_dashboard_stats');
+      const { data, error } = await supabase.rpc('admin_dashboard_snapshot');
       if (error) throw error;
       return {
         total_users: unwrapObject<AdminStats>(data)?.total_users ?? 0,
@@ -212,6 +229,12 @@ export const adminApi = {
       console.error('getOverviewStats error:', err);
       throw err;
     }
+  },
+
+  getUsersPage: async (search = '', page = 1, pageSize = 25): Promise<PaginatedResult<User>> => {
+    const { data, error } = await supabase.rpc('admin_get_users_page', { p_search: search || null, p_page: page, p_page_size: pageSize });
+    if (error) throw error;
+    return unwrapPage<User>(data);
   },
 
   getUsers: async (search: string = ''): Promise<User[]> => {
@@ -282,6 +305,12 @@ export const adminApi = {
     }
   },
 
+  getCreditHistoryPage: async (search = '', page = 1, pageSize = 25): Promise<PaginatedResult<CreditTransaction>> => {
+    const { data, error } = await supabase.rpc('admin_get_credit_history_page', { p_search: search || null, p_page: page, p_page_size: pageSize });
+    if (error) throw error;
+    return unwrapPage<CreditTransaction>(data);
+  },
+
   getGenerations: async (): Promise<Generation[]> => {
     try {
       const { data, error } = await supabase.rpc('admin_get_generations', {
@@ -294,6 +323,12 @@ export const adminApi = {
       console.error('getGenerations error:', err);
       throw err;
     }
+  },
+
+  getGenerationsPage: async (search = '', status: string | null = null, page = 1, pageSize = 25): Promise<PaginatedResult<Generation>> => {
+    const { data, error } = await supabase.rpc('admin_get_generations_page', { p_search: search || null, p_status: status, p_page: page, p_page_size: pageSize, p_stuck_minutes: 15 });
+    if (error) throw error;
+    return unwrapPage<Generation>(data);
   },
 
   retryGeneration: async (generationId: string, reason?: string): Promise<void> => {
@@ -348,6 +383,12 @@ export const adminApi = {
       console.error('getAuditLogs error:', err);
       throw err;
     }
+  },
+
+  getAuditLogsPage: async (search = '', action: string | null = null, page = 1, pageSize = 25): Promise<PaginatedResult<AuditLog>> => {
+    const { data, error } = await supabase.rpc('admin_get_audit_logs_page', { p_search: search || null, p_action: action, p_page: page, p_page_size: pageSize });
+    if (error) throw error;
+    return unwrapPage<AuditLog>(data);
   },
 
   getDailyStats: async (): Promise<DailyStats[]> => {
@@ -441,6 +482,18 @@ export const adminApi = {
       p_key: key,
       p_value: key === 'maintenance_mode' ? Boolean(value) : Number(value),
     });
+    if (error) throw error;
+  },
+
+  getSettingHistory: async (key: string | null = null, page = 1, pageSize = 25): Promise<PaginatedResult<Record<string, unknown>>> => {
+    const { data, error } = await supabase.rpc('admin_get_setting_history', { p_key: key, p_page: page, p_page_size: pageSize });
+    if (error) throw error;
+    return unwrapPage<Record<string, unknown>>(data);
+  },
+
+  restoreSetting: async (historyId: string, reason: string): Promise<void> => {
+    const p_reason = requireReason(reason, 'restore a setting');
+    const { error } = await supabase.rpc('admin_restore_setting', { p_history_id: historyId, p_reason });
     if (error) throw error;
   }
 };

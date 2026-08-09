@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { downloadAdminCsv } from '@/lib/adminCsv';
 
 export function AuditLogs() {
   const [search, setSearch] = useState('');
@@ -24,27 +25,12 @@ export function AuditLogs() {
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
   const { data: logs, isLoading } = useQuery({
-    queryKey: ['adminAuditLogs'],
-    queryFn: adminApi.getAuditLogs,
+    queryKey: ['adminAuditLogs', search, actionFilter, page],
+    queryFn: () => adminApi.getAuditLogsPage(search, actionFilter === 'all' ? null : actionFilter, page, pageSize),
   });
 
-  const filteredLogs = (logs || []).filter((item) => {
-    const q = search.toLowerCase();
-    const matchesSearch =
-      (item.admin_email && item.admin_email.toLowerCase().includes(q)) ||
-      (item.target_user_email && item.target_user_email.toLowerCase().includes(q)) ||
-      (item.action && item.action.toLowerCase().includes(q)) ||
-      (item.reason && item.reason.toLowerCase().includes(q)) ||
-      (item.id && item.id.toLowerCase().includes(q));
-
-    const matchesAction =
-      actionFilter === 'all' || item.action.toLowerCase().includes(actionFilter.toLowerCase());
-
-    return matchesSearch && matchesAction;
-  });
-
-  const totalPages = Math.max(1, Math.ceil(filteredLogs.length / pageSize));
-  const currentPageItems = filteredLogs.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.max(1, Math.ceil((logs?.total ?? 0) / pageSize));
+  const currentPageItems = logs?.data ?? [];
 
   return (
     <div className="space-y-6 text-xs">
@@ -56,6 +42,12 @@ export function AuditLogs() {
             Immutable log of all administrative actions, credit grants, user bans, and setting overrides.
           </p>
         </div>
+        <button
+          type="button"
+          onClick={() => downloadAdminCsv('prdsprint-audit-logs.csv', currentPageItems as unknown as Array<Record<string, unknown>>)}
+          disabled={!currentPageItems.length}
+          className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-200 disabled:opacity-40"
+        >Export CSV</button>
       </div>
 
       {/* Search & Filter Bar */}
@@ -161,7 +153,7 @@ export function AuditLogs() {
         {/* Pagination Bar */}
         <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between text-gray-400">
           <span>
-            Showing {currentPageItems.length} of {filteredLogs.length} audit records
+            Showing {currentPageItems.length} of {logs?.total ?? 0} audit records
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -176,7 +168,7 @@ export function AuditLogs() {
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
+              disabled={page >= totalPages || !logs?.has_more}
               className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white disabled:opacity-30 cursor-pointer"
             >
               <ChevronRight size={16} />

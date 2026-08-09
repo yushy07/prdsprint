@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { motion, AnimatePresence } from 'motion/react';
+import { downloadAdminCsv } from '@/lib/adminCsv';
 
 export function Credits() {
   const [search, setSearch] = useState('');
@@ -36,8 +37,8 @@ export function Credits() {
 
   // Fetch Credit History
   const { data: history, isLoading } = useQuery({
-    queryKey: ['adminCreditHistory'],
-    queryFn: adminApi.getCreditHistory,
+    queryKey: ['adminCreditHistory', search, page],
+    queryFn: () => adminApi.getCreditHistoryPage(search, page, pageSize),
   });
 
   // Credit mutation
@@ -88,22 +89,8 @@ export function Credits() {
   };
 
   // Filter history
-  const filteredHistory = (history || []).filter((item) => {
-    const q = search.toLowerCase();
-    const matchesSearch =
-      (item.user_email && item.user_email.toLowerCase().includes(q)) ||
-      (item.description && item.description.toLowerCase().includes(q)) ||
-      (item.user_id && item.user_id.toLowerCase().includes(q)) ||
-      (item.request_id && item.request_id.toLowerCase().includes(q)) ||
-      (item.generation_id && item.generation_id.toLowerCase().includes(q));
-
-    const matchesType = typeFilter === 'all' || item.type.toLowerCase() === typeFilter.toLowerCase();
-
-    return matchesSearch && matchesType;
-  });
-
-  const totalPages = Math.max(1, Math.ceil(filteredHistory.length / pageSize));
-  const currentPageItems = filteredHistory.slice((page - 1) * pageSize, page * pageSize);
+  const currentPageItems = (history?.data ?? []).filter((item) => typeFilter === 'all' || item.type.toLowerCase() === typeFilter.toLowerCase());
+  const totalPages = Math.max(1, Math.ceil((history?.total ?? 0) / pageSize));
 
   return (
     <div className="space-y-6 text-xs">
@@ -115,6 +102,13 @@ export function Credits() {
             Auditable transaction history for credit issuances, generation deductions, and manual adjustments.
           </p>
         </div>
+
+        <button
+          type="button"
+          onClick={() => downloadAdminCsv('prdsprint-credit-ledger.csv', currentPageItems as unknown as Array<Record<string, unknown>>)}
+          disabled={!currentPageItems.length}
+          className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-200 disabled:opacity-40"
+        >Export CSV</button>
 
         <button
           onClick={() => {
@@ -274,7 +268,7 @@ export function Credits() {
         {/* Pagination Bar */}
         <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between text-gray-400">
           <span>
-            Showing {currentPageItems.length} of {filteredHistory.length} transactions
+            Showing {currentPageItems.length} of {history?.total ?? 0} transactions
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -289,7 +283,7 @@ export function Credits() {
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
+              disabled={page >= totalPages || !history?.has_more}
               className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white disabled:opacity-30 cursor-pointer"
             >
               <ChevronRight size={16} />
