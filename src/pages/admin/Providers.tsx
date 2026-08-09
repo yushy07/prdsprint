@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { adminApi } from '@/services/admin/api';
 import { Server, CheckCircle2, XCircle, Activity, Cpu, AlertTriangle } from 'lucide-react';
+import { AdminEmptyState, AdminErrorState, AdminLoadingState } from '@/components/admin/AdminPageState';
 
 export function Providers() {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, isError, refetch } = useQuery({
     queryKey: ['adminProviderStats'],
     queryFn: adminApi.getProviderStats,
   });
@@ -19,13 +20,11 @@ export function Providers() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-48 rounded-2xl bg-[#0f0f13] border border-white/10 animate-pulse"></div>
-          ))
+          <div className="col-span-full"><AdminLoadingState title="Loading provider telemetry" /></div>
+        ) : isError ? (
+          <div className="col-span-full"><AdminErrorState message="Provider telemetry could not be loaded." onRetry={() => refetch()} /></div>
         ) : !stats || stats.length === 0 ? (
-          <div className="col-span-full p-8 bg-[#0f0f13] border border-white/10 rounded-2xl text-center text-gray-400">
-            No provider telemetry recorded yet.
-          </div>
+          <div className="col-span-full"><AdminEmptyState title="No provider telemetry yet" message="Provider statistics will appear after generation requests are recorded." /></div>
         ) : (
           stats.map((provider) => (
             <div
@@ -56,7 +55,7 @@ export function Providers() {
                     }`}
                   >
                     <Activity size={11} />
-                    {provider.success_rate.toFixed(1)}%
+                    {provider.total_requests < 10 ? 'Low sample' : `${provider.success_rate.toFixed(1)}%`}
                   </span>
                 </div>
 
@@ -94,4 +93,3 @@ export function Providers() {
     </div>
   );
 }
-

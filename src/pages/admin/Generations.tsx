@@ -533,4 +533,3 @@ export function Generations() {
     </div>
   );
 }
-

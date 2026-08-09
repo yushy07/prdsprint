@@ -180,7 +180,7 @@ export function AdminLayout() {
   );
 
   return (
-    <div className="flex h-screen bg-[#070709] text-gray-200 overflow-hidden font-sans">
+    <div className="flex h-[100dvh] min-h-0 bg-[#070709] text-gray-200 overflow-hidden font-sans">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-64 flex-shrink-0 bg-[#0f0f13] border-r border-white/10 flex-col">
         <SidebarContent />
@@ -211,7 +211,7 @@ export function AdminLayout() {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 bg-[#070709]">
+      <main className="flex-1 min-w-0 min-h-0 flex flex-col bg-[#070709]">
         {/* Top Header Bar */}
         <header className="h-16 flex items-center justify-between px-4 lg:px-6 bg-[#0f0f13]/80 backdrop-blur-md border-b border-white/10 flex-shrink-0 sticky top-0 z-30">
           <div className="flex items-center gap-3">
@@ -300,7 +300,7 @@ export function AdminLayout() {
         </header>
 
         {/* Dynamic Admin Page Outlet */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8 [scrollbar-gutter:stable]">
           <div className="max-w-7xl mx-auto space-y-6">
             <Outlet />
           </div>

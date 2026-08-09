@@ -10,6 +10,8 @@ import { SmoothScroll } from "@/components/SmoothScroll";
 import { ToastProvider } from "@/context/ToastContext";
 import { CreditProvider } from "@/context/CreditContext";
 import { QueryProvider } from "@/components/QueryProvider";
+import { AdminErrorBoundary } from "@/components/admin/AdminErrorBoundary";
+import { AdminLoadingState } from "@/components/admin/AdminPageState";
 
 const Home = lazy(() => import("@/pages/Home").then(module => ({ default: module.Home })));
 const Dashboard = lazy(() => import("@/pages/Dashboard").then(module => ({ default: module.Dashboard })));
@@ -77,7 +79,7 @@ function AnimatedRoutes() {
         transition={{ duration: 0.2, ease: "easeOut" }}
         className="w-full min-h-screen bg-[#030305]"
       >
-        <Suspense fallback={<div className="w-full min-h-screen bg-[#030305]" />}>
+        <Suspense fallback={location.pathname.startsWith('/admin') ? <AdminLoadingState /> : <div className="w-full min-h-screen bg-[#030305]" />}>
           <Routes location={location}>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
@@ -85,7 +87,7 @@ function AnimatedRoutes() {
             <Route path="/checkout" element={<Checkout />} />
             
             {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminErrorBoundary><AdminLayout /></AdminErrorBoundary>}>
               <Route index element={<Overview />} />
               <Route path="users" element={<Users />} />
               <Route path="credits" element={<Credits />} />

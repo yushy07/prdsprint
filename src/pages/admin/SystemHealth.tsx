@@ -1,23 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { adminApi } from '@/services/admin/api';
 import { Database, HardDrive, Cpu, Clock, ShieldCheck, AlertCircle } from 'lucide-react';
+import { AdminEmptyState, AdminErrorState, AdminLoadingState } from '@/components/admin/AdminPageState';
 
 export function SystemHealth() {
-  const { data: health, isLoading, error } = useQuery({
+  const { data: health, isLoading, error, refetch } = useQuery({
     queryKey: ['adminSystemHealth'],
     queryFn: adminApi.getSystemHealth,
   });
 
   if (error) {
-    return (
-      <div className="p-6 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-2xl flex items-center gap-3">
-        <AlertCircle size={20} className="shrink-0" />
-        <div>
-          <p className="font-bold text-sm">System Health Telemetry Unavailable</p>
-          <p className="text-xs text-rose-300/80 mt-0.5">Failed to establish communication with background health checkers.</p>
-        </div>
-      </div>
-    );
+    return <AdminErrorState title="System health unavailable" message="Failed to establish communication with the health checkers." onRetry={() => refetch()} />;
   }
 
   const getStatusColor = (status?: string) => {
@@ -39,9 +32,7 @@ export function SystemHealth() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {isLoading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 rounded-2xl bg-[#0f0f13] border border-white/10 animate-pulse" />
-          ))
+          <div className="col-span-full"><AdminLoadingState title="Checking infrastructure health" /></div>
         ) : (
           <>
             <div className="p-5 rounded-2xl bg-[#0f0f13] border border-white/10 flex items-center gap-4 hover:border-white/20 transition-all shadow-xl">
@@ -97,4 +88,3 @@ export function SystemHealth() {
     </div>
   );
 }
-
