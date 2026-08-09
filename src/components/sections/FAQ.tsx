@@ -125,7 +125,7 @@ const faqs = [
   },
   {
     question: "Can I edit the generated PRD after it's created?",
-    answer: "Yes. Every generated PRD is fully editable. You can modify the Markdown files, PDF content, architecture, features, and design system before handing them to your team or AI coding assistant."
+    answer: "Yes. Every generated PRD is fully editable. You can modify the Markdown files, architecture, features, and theme documentation before handing them to your team or AI coding assistant."
   },
   {
     question: "How long does it take to generate a PRD?",

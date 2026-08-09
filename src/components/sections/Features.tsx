@@ -108,10 +108,10 @@ const features = [
     color: "teal"
   },
   { 
-    id: "pdf",
+    id: "markdown",
     icon: FileType, 
-    title: "PDF + MD Output", 
-    desc: "Shareable PDF and Markdown formats for your entire team and stakeholders.",
+    title: "Markdown PRD Output",
+    desc: "Portable Markdown files for your team and AI coding assistants.",
     color: "rose"
   },
   { 

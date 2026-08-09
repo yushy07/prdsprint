@@ -107,7 +107,7 @@ The frontend submits support messages:
 
 ```json
 {
-  "message": "Can I export PRDs directly to PDF?"
+  "message": "Can I export the generated Markdown package?"
 }
 ```
 

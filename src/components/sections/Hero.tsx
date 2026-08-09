@@ -88,7 +88,7 @@ const features = [
   },
   { 
     title: "Instant Export", 
-    subtitle: "PDF, MD & More", 
+    subtitle: "Markdown, ZIP & More",
     icon: <Rocket size={18} className="text-rose-400" />,
     borderHover: "hover:border-rose-400/50"
   }
